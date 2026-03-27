@@ -1,2 +1,4 @@
-from backend.app.main import app 
-handler = app 
+from backend.app.main import app
+
+# Vercel requires this handler
+handler = app
