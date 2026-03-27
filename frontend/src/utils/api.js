@@ -3,19 +3,19 @@
 
 import axios from 'axios'
 
-// ✅ STRICT: no fallback (forces correct env usage)
+// ✅ STRICT ENV (no fallback)
 const BASE_URL = import.meta.env.VITE_API_URL
 
 if (!BASE_URL) {
   throw new Error("❌ VITE_API_URL is not defined. Check your environment variables.")
 }
 
-// Create axios instance
+// Axios instance
 const api = axios.create({
   baseURL: BASE_URL,
 })
 
-// Add auth token to requests
+// Attach token automatically
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token')
   if (token) {
@@ -26,29 +26,40 @@ api.interceptors.request.use((config) => {
 
 /* ================= AUTH ================= */
 
-export async function register(username, email, password) {
-  const res = await api.post('/api/auth/register', {
-    username,
-    email,
-    password
-  })
-  return res.data
+// ✅ FIXED LOGIN (JSON instead of form-data)
+export async function login(username, password) {
+  try {
+    const res = await api.post('/api/auth/login', {
+      username,
+      password
+    })
+
+    const { access_token } = res.data
+    localStorage.setItem('token', access_token)
+
+    return res.data
+  } catch (err) {
+    console.error('❌ Login error:', err.response?.data || err.message)
+    throw err
+  }
 }
 
-export async function login(username, password) {
-  const res = await api.post(
-    '/api/auth/login',
-    new URLSearchParams({ username, password }),
-    {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
-    }
-  )
+export async function register(username, email, password) {
+  try {
+    const res = await api.post('/api/auth/register', {
+      username,
+      email,
+      password
+    })
 
-  const { access_token } = res.data
-  localStorage.setItem('token', access_token)
-  return res.data
+    const { access_token } = res.data
+    localStorage.setItem('token', access_token)
+
+    return res.data
+  } catch (err) {
+    console.error('❌ Register error:', err.response?.data || err.message)
+    throw err
+  }
 }
 
 export function logout() {
