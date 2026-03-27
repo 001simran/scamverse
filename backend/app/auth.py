@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from .database import get_db
 from .models import User
 
-SECRET_KEY = "your-secret-key-here"  # In production, use environment variable
+SECRET_KEY = "ba4d35adf380a28d244ba07bdeb01932c34a6543a566bb8cd7c4f07039dde0d7"  # In production, use environment variable
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 

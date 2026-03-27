@@ -1,13 +1,18 @@
-# ScamVerse - HackMol 7.0
-# main.py - FastAPI app entry point
-# took a while to get CORS working lol
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from .routes import scenarios, ai_chat, spin, auth, progress
 from .database import engine
 from . import models
+
+# Ensure SECRET_KEY exists
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    raise ValueError("❌ SECRET_KEY is not set in environment variables")
 
 # Create database tables
 models.Base.metadata.create_all(bind=engine)
@@ -18,10 +23,8 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# CORS so React frontend can talk to this
-# without this you get blocked by browser
+# CORS setup
 frontend_origin = os.getenv("FRONTEND_ORIGIN", "").strip()
-extra_origins = [o.strip() for o in os.getenv("EXTRA_CORS_ORIGINS", "").split(",") if o.strip()]
 
 app.add_middleware(
     CORSMiddleware,
@@ -31,41 +34,19 @@ app.add_middleware(
         "http://localhost:5174",
         "http://127.0.0.1:5174",
         "http://localhost:3000",
-        *([frontend_origin] if frontend_origin else []),
-        *extra_origins,
+        frontend_origin,
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# register all routes
-app.include_router(
-    auth.router,
-    prefix="/api/auth",
-    tags=["Authentication"]
-)
-app.include_router(
-    progress.router,
-    prefix="/api/progress",
-    tags=["Progress"]
-)
-app.include_router(
-    scenarios.router,
-    prefix="/api/scenarios",
-    tags=["Scenarios"]
-)
-app.include_router(
-    ai_chat.router,
-    prefix="/api/ai",
-    tags=["AI Chat"]
-)
-app.include_router(
-    spin.router,
-    prefix="/api/spin",
-    tags=["Spin Wheel"]
-)
-
+# Register routes
+app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
+app.include_router(progress.router, prefix="/api/progress", tags=["Progress"])
+app.include_router(scenarios.router, prefix="/api/scenarios", tags=["Scenarios"])
+app.include_router(ai_chat.router, prefix="/api/ai", tags=["AI Chat"])
+app.include_router(spin.router, prefix="/api/spin", tags=["Spin Wheel"])
 
 @app.get("/")
 async def root():
@@ -74,7 +55,6 @@ async def root():
         "version": "1.0.0",
         "hackathon": "HackMol 7.0"
     }
-
 
 @app.get("/health")
 async def health_check():
