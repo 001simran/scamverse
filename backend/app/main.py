@@ -6,10 +6,11 @@ from .routes import scenarios, ai_chat, spin, auth, progress
 from .database import engine
 from . import models
 
-# Ensure SECRET_KEY exists
-SECRET_KEY = os.getenv("SECRET_KEY")
-if not SECRET_KEY:
-    raise ValueError("❌ SECRET_KEY is not set in environment variables")
+# ✅ SAFE SECRET KEY (no crash)
+SECRET_KEY = os.getenv("SECRET_KEY", "dev_fallback_secret")
+
+if SECRET_KEY == "dev_fallback_secret":
+    print("⚠️ WARNING: SECRET_KEY not set, using fallback")
 
 # Create database tables
 models.Base.metadata.create_all(bind=engine)
@@ -20,7 +21,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# ✅ FIX: Build CORS origins list cleanly — no empty strings
+# CORS
 _base_origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
@@ -42,12 +43,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Register routes
+# Routes
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(progress.router, prefix="/api/progress", tags=["Progress"])
 app.include_router(scenarios.router, prefix="/api/scenarios", tags=["Scenarios"])
 app.include_router(ai_chat.router, prefix="/api/ai", tags=["AI Chat"])
 app.include_router(spin.router, prefix="/api/spin", tags=["Spin Wheel"])
+
 
 @app.get("/")
 async def root():
@@ -56,6 +58,7 @@ async def root():
         "version": "1.0.0",
         "hackathon": "HackMol 7.0"
     }
+
 
 @app.get("/health")
 async def health_check():

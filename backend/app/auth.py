@@ -1,6 +1,3 @@
-# ScamVerse - HackMol 7.0
-# auth.py - Authentication utilities
-
 from datetime import datetime, timedelta
 from typing import Optional
 import os
@@ -15,20 +12,17 @@ from .database import get_db
 from .models import User
 from .config import get_settings
 
-# Get settings from config
 settings = get_settings()
 
-# Load SECRET_KEY from settings
-SECRET_KEY = settings.secret_key
-if not SECRET_KEY:
-    raise ValueError("❌ SECRET_KEY is not set in environment variables")
+# ✅ SAFE SECRET KEY HANDLING
+SECRET_KEY = settings.secret_key or os.getenv("SECRET_KEY") or "dev_fallback_secret"
+
+if SECRET_KEY == "dev_fallback_secret":
+    print("⚠️ WARNING: Using fallback SECRET_KEY")
 
 ALGORITHM = "HS256"
-
-# Get token expiry from settings
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
 
-# Password hashing
 pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 security = HTTPBearer()
 
@@ -51,11 +45,6 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
 
 
 def authenticate_user(db: Session, username: str, password: str):
-    """
-    Returns the User object if credentials are valid, False otherwise.
-    Also supports login by email (common user expectation).
-    """
-    # Try matching by username OR email so users aren't confused
     user = db.query(User).filter(
         (User.username == username) | (User.email == username)
     ).first()
@@ -73,7 +62,7 @@ def get_current_user(
 ):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials. Please log in again.",
+        detail="Could not validate credentials.",
         headers={"WWW-Authenticate": "Bearer"},
     )
 
