@@ -6,7 +6,7 @@ import axios from 'axios'
 
 const BASE_URL =
   (import.meta?.env?.VITE_API_URL && String(import.meta.env.VITE_API_URL)) ||
-  'http://localhost:8000'
+  'http://localhost:8001'
 
 // Create axios instance with auth
 const api = axios.create({
