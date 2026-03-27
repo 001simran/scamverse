@@ -1,14 +1,16 @@
 // ScamVerse - HackMol 7.0
 // api.js - all backend calls in one place
-// connects frontend to Simran's backend
 
 import axios from 'axios'
 
-const BASE_URL =
-  (import.meta?.env?.VITE_API_URL && String(import.meta.env.VITE_API_URL)) ||
-  'http://localhost:8001'
+// ✅ STRICT: no fallback (forces correct env usage)
+const BASE_URL = import.meta.env.VITE_API_URL
 
-// Create axios instance with auth
+if (!BASE_URL) {
+  throw new Error("❌ VITE_API_URL is not defined. Check your environment variables.")
+}
+
+// Create axios instance
 const api = axios.create({
   baseURL: BASE_URL,
 })
@@ -22,169 +24,167 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// Auth functions
+/* ================= AUTH ================= */
+
 export async function register(username, email, password) {
-  const response = await api.post('/api/auth/register', {
+  const res = await api.post('/api/auth/register', {
     username,
     email,
     password
   })
-  return response.data
+  return res.data
 }
 
 export async function login(username, password) {
-  const response = await api.post('/api/auth/login', new URLSearchParams({
-    username,
-    password
-  }), {
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
+  const res = await api.post(
+    '/api/auth/login',
+    new URLSearchParams({ username, password }),
+    {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
     }
-  })
-  const { access_token } = response.data
+  )
+
+  const { access_token } = res.data
   localStorage.setItem('token', access_token)
-  return response.data
+  return res.data
 }
 
 export function logout() {
   localStorage.removeItem('token')
 }
 
-// Progress functions
+/* ================= PROGRESS ================= */
+
 export async function saveProgress(scenarioId, completed = false, score = 0, notes = null) {
-  const response = await api.post('/api/progress/progress', {
+  const res = await api.post('/api/progress/progress', {
     scenario_id: scenarioId,
     completed,
     score,
     notes
   })
-  return response.data
+  return res.data
 }
 
 export async function getProgress() {
-  const response = await api.get('/api/progress/progress')
-  return response.data
+  const res = await api.get('/api/progress/progress')
+  return res.data
 }
 
 export async function getScenarioProgress(scenarioId) {
-  const response = await api.get(`/api/progress/progress/${scenarioId}`)
-  return response.data
+  const res = await api.get(`/api/progress/progress/${scenarioId}`)
+  return res.data
 }
 
-// get random scenario for a building
+/* ================= SCENARIOS ================= */
+
 export async function getScenario(playerName, scamType = null) {
   try {
     let url = `/api/scenarios/random?player_name=${playerName}`
     if (scamType) url += `&scam_type=${scamType}`
-    const response = await api.get(url)
-    return response.data
+    const res = await api.get(url)
+    return res.data
   } catch (err) {
-    console.log('backend not connected, using fallback')
+    console.error('❌ getScenario error:', err)
     return null
   }
 }
 
-// get all scenarios
 export async function getAllScenarios() {
   try {
-    const response = await api.get('/api/scenarios/all')
-    return response.data.scenarios
+    const res = await api.get('/api/scenarios/all')
+    return res.data.scenarios
   } catch (err) {
-    console.log('getAllScenarios error:', err)
+    console.error('❌ getAllScenarios error:', err)
     return []
   }
 }
 
-// analyze a message with AI
+/* ================= AI ================= */
+
 export async function analyzeMessage(message, playerName) {
   try {
-    const response = await api.post('/api/scenarios/analyze', {
+    const res = await api.post('/api/scenarios/analyze', {
       message,
       player_name: playerName
     })
-    return response.data.analysis
+    return res.data.analysis
   } catch (err) {
-    console.log('analyzeMessage error:', err)
+    console.error('❌ analyzeMessage error:', err)
     return null
   }
 }
 
-// get spin wheel segments
-export async function getSpinSegments() {
-  try {
-    const response = await api.get('/api/spin/segments')
-    return response.data.segments
-  } catch (err) {
-    console.log('getSpinSegments error:', err)
-    return null
-  }
-}
-
-// ask cyberguide a question
 export async function askCyberGuide(question, playerName) {
   try {
-    const response = await api.post('/api/ai/chat', {
+    const res = await api.post('/api/ai/chat', {
       question,
       player_name: playerName
     })
-    return response.data
+    return res.data
   } catch (err) {
-    console.log('askCyberGuide error:', err)
+    console.error('❌ askCyberGuide error:', err)
     return null
   }
 }
 
-// get daily tips
 export async function getDailyTips() {
   try {
-    const response = await api.get('/api/ai/tips')
-    return response.data.tips
+    const res = await api.get('/api/ai/tips')
+    return res.data.tips
   } catch (err) {
-    console.log('getDailyTips error:', err)
+    console.error('❌ getDailyTips error:', err)
     return []
   }
 }
 
-// analyze text message for scam detection
+/* ================= UTILITIES ================= */
+
+export async function getSpinSegments() {
+  try {
+    const res = await api.get('/api/spin/segments')
+    return res.data.segments
+  } catch (err) {
+    console.error('❌ getSpinSegments error:', err)
+    return null
+  }
+}
+
 export async function analyzeTextMessage(message) {
   try {
-    const response = await api.post('/api/scenarios/analyze', {
-      message
-    })
-    return response.data
+    const res = await api.post('/api/scenarios/analyze', { message })
+    return res.data
   } catch (err) {
-    console.log('analyzeTextMessage error:', err)
+    console.error('❌ analyzeTextMessage error:', err)
     return null
   }
 }
 
-// check URL for safety
 export async function checkUrlSafety(url) {
   try {
-    const response = await api.post('/api/safe-browsing/check', {
-      url
-    })
-    return response.data
+    const res = await api.post('/api/safe-browsing/check', { url })
+    return res.data
   } catch (err) {
-    console.log('checkUrlSafety error:', err)
+    console.error('❌ checkUrlSafety error:', err)
     return null
   }
 }
 
-// analyze image for deepfake
 export async function analyzeImageDeepfake(imageFile) {
   try {
     const formData = new FormData()
     formData.append('image', imageFile)
 
-    const response = await api.post('/api/deepfake/analyze', formData, {
+    const res = await api.post('/api/deepfake/analyze', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
     })
-    return response.data
+
+    return res.data
   } catch (err) {
-    console.log('analyzeImageDeepfake error:', err)
+    console.error('❌ analyzeImageDeepfake error:', err)
     return null
   }
 }
