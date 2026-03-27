@@ -1,0 +1,220 @@
+{
+  "wheel_segments": [
+    {
+      "type": "DIGITAL_ARREST",
+      "icon": "🚔",
+      "color": "#e53935",
+      "label": "Digital Arrest",
+      "today_stat": "92,334 cases reported in India in 2024",
+      "real_case": {
+        "name": "Ramesh Gupta",
+        "age": 58,
+        "city": "Lucknow",
+        "occupation": "Retired teacher",
+        "amount_lost": "Rs 14 lakh",
+        "duration": "6 hours on call",
+        "what_happened": "Got call from CBI Inspector Sharma. Told his Aadhaar was linked to drug money. Kept on video call for 6 hours. Transferred Rs 14 lakh to government escrow. Lost entire retirement savings.",
+        "date": "November 2024"
+      },
+      "how_it_works": "Scammer poses as CBI or ED officer on video call. Claims your Aadhaar is linked to crime. Keeps you on call for hours using psychological pressure. Demands money to clear your name.",
+      "red_flags": [
+        "CBI never arrests anyone digitally — no such law exists in India",
+        "Real agencies send official written notices only",
+        "Any caller who says dont tell family is manipulating you",
+        "Government never takes payment on UPI or NEFT"
+      ],
+      "safety_tip": "Hang up immediately. Call 1930. Tell your family right away.",
+      "total_loss_2024": "Rs 2140 crore",
+      "source": "MHA Cyber Crime Report 2024"
+    },
+    {
+      "type": "UPI_TRAP",
+      "icon": "💸",
+      "color": "#f57c00",
+      "label": "UPI Trap",
+      "today_stat": "8,923 cases in last quarter alone",
+      "real_case": {
+        "name": "Sunita Sharma",
+        "age": 34,
+        "city": "Pune",
+        "occupation": "Homemaker",
+        "amount_lost": "Rs 38,000",
+        "duration": "15 minutes",
+        "what_happened": "Received Rs 1 credit from unknown UPI ID. Got call saying Amazon refund of Rs 1299 needs OTP verification. Shared OTP. Rs 38000 debited from account within seconds.",
+        "date": "October 2024"
+      },
+      "how_it_works": "Scammer credits Rs 1 to your account to gain trust. Then calls saying you need to share OTP to receive a larger refund. But OTP actually authorises them to debit your full account balance.",
+      "red_flags": [
+        "You NEVER need OTP to receive money — ever",
+        "Rs 1 credit is bait to make the scam feel real",
+        "Legitimate refunds are automatic — no call or OTP needed",
+        "Time pressure 10 minutes to expire is manipulation"
+      ],
+      "safety_tip": "OTP only sends money OUT of your account. Never share OTP to receive money.",
+      "total_loss_2024": "Rs 340 crore",
+      "source": "NPCI Fraud Report 2024"
+    },
+    {
+      "type": "OTP_SCAM",
+      "icon": "📱",
+      "color": "#1976d2",
+      "label": "OTP Scam",
+      "today_stat": "Most common scam — 4,521 cases last month",
+      "real_case": {
+        "name": "Mohan Lal",
+        "age": 67,
+        "city": "Jaipur",
+        "occupation": "Retired clerk",
+        "amount_lost": "Rs 1.2 lakh",
+        "duration": "20 minutes",
+        "what_happened": "Got call from SBI officer. Told account would be blocked. Asked for OTP to verify. Shared 3 OTPs in panic. Rs 1.2 lakh transferred in 3 separate transactions.",
+        "date": "December 2024"
+      },
+      "how_it_works": "Scammer poses as bank employee. Creates urgency that account will be blocked or KYC expired. Asks for OTP to verify. Each OTP they receive authorises a separate bank transfer.",
+      "red_flags": [
+        "Banks NEVER ask for OTP — this is their official policy",
+        "Real bank calls come from toll-free numbers only",
+        "Account block threats are designed to cause panic",
+        "Never share OTP with anyone including bank staff"
+      ],
+      "safety_tip": "Hang up. Call bank directly on the number printed on your debit card.",
+      "total_loss_2024": "Rs 890 crore",
+      "source": "RBI Annual Report on Cyber Fraud 2024"
+    },
+    {
+      "type": "INVESTMENT_FRAUD",
+      "icon": "📈",
+      "color": "#388e3c",
+      "label": "Investment Trap",
+      "today_stat": "2,341 fake SEBI groups shut down this year",
+      "real_case": {
+        "name": "Priya Nair",
+        "age": 29,
+        "city": "Bengaluru",
+        "occupation": "Software Engineer",
+        "amount_lost": "Rs 4.5 lakh",
+        "duration": "3 months",
+        "what_happened": "Joined WhatsApp investment group. Got real Rs 12000 profit in first month. Invested Rs 4.5 lakh in month 2. Group disappeared overnight. Money completely gone.",
+        "date": "September 2024"
+      },
+      "how_it_works": "Fake SEBI certified traders show fabricated profit screenshots. Give small real profits initially to build trust. After trust is built victim invests large amount which completely disappears.",
+      "red_flags": [
+        "SEBI prohibits guaranteed return promises — it is illegal",
+        "Real investments always carry risk — no exceptions ever",
+        "Screenshots of profits are trivially easy to fake",
+        "Pressure to invest more after initial small gains"
+      ],
+      "safety_tip": "Verify any advisor at sebi.gov.in before investing a single rupee.",
+      "total_loss_2024": "Rs 2300 crore",
+      "source": "SEBI Investor Bulletin 2024"
+    },
+    {
+      "type": "DEEPFAKE",
+      "icon": "🎭",
+      "color": "#7b1fa2",
+      "label": "Deepfake Call",
+      "today_stat": "AI voice cloning attacks up 156% in 2024",
+      "real_case": {
+        "name": "Kavitha Menon",
+        "age": 61,
+        "city": "Kochi",
+        "occupation": "Retired professor",
+        "amount_lost": "Rs 87,000",
+        "duration": "45 minutes",
+        "what_happened": "Received WhatsApp video call from son number. Son face and voice said he was detained at Dubai airport and needed Rs 87000 immediately. She transferred money. Son was in Bengaluru the whole time.",
+        "date": "October 2024"
+      },
+      "how_it_works": "AI tools can clone a voice from just 3 seconds of audio from social media videos. Scammers create convincing video calls using deepfake technology targeting elderly parents.",
+      "red_flags": [
+        "Lip sync is slightly delayed in AI generated video",
+        "Any request for money plus secrecy is always a red flag",
+        "Real emergency means real person accepts a callback",
+        "Hair edges and facial boundaries look slightly unnatural"
+      ],
+      "safety_tip": "Hang up. Call back on the real saved number. Ask a personal question only they would know.",
+      "total_loss_2024": "Rs 156 crore reported only",
+      "source": "Delhi Cyber Cell Annual Report 2024"
+    },
+    {
+      "type": "JOB_SCAM",
+      "icon": "💼",
+      "color": "#00838f",
+      "label": "Fake Job",
+      "today_stat": "Peak placement season — targeting freshers right now",
+      "real_case": {
+        "name": "Arjun Patel",
+        "age": 23,
+        "city": "Ahmedabad",
+        "occupation": "Engineering graduate",
+        "amount_lost": "Rs 45,000",
+        "duration": "2 weeks",
+        "what_happened": "Got WhatsApp message with Infosys offer letter. 6 LPA package. Paid Rs 2500 document fee then Rs 8000 training fee then Rs 15000 background check then Rs 19500 laptop deposit. Total Rs 45000 lost. Never joined.",
+        "date": "March 2024"
+      },
+      "how_it_works": "Fake offer letters with real company logos. Starts with small fee of Rs 2000 to 3000. Builds trust then asks for more fees. Multiple escalating charges until victim stops paying.",
+      "red_flags": [
+        "Real companies NEVER charge any fees for joining",
+        "Infosys TCS Wipro HR use company email not Gmail",
+        "No legitimate company asks for UPI payment from candidates",
+        "Offer without any interview process is always suspicious"
+      ],
+      "safety_tip": "Verify jobs only on official company career portals. Never pay any fees to get a job.",
+      "total_loss_2024": "Rs 89 crore",
+      "source": "NCCRP Job Fraud Report 2024"
+    },
+    {
+      "type": "LOTTERY",
+      "icon": "🎰",
+      "color": "#f9a825",
+      "label": "Lottery Scam",
+      "today_stat": "12,450 cases — highest in rural areas of India",
+      "real_case": {
+        "name": "Bharti Devi",
+        "age": 52,
+        "city": "Gorakhpur",
+        "occupation": "Farmer",
+        "amount_lost": "Rs 32,000",
+        "duration": "1 week",
+        "what_happened": "Got SMS saying KBC Season 15 lucky winner Rs 25 lakh prize. Called the number. Paid Rs 5000 GST then Rs 8000 legal fee then Rs 11000 customs fee then Rs 8000 more fees. After Rs 32000 total she realized it was fraud.",
+        "date": "August 2024"
+      },
+      "how_it_works": "Fake KBC or government lottery SMS. Asks for small processing fee first. Each payment generates a new excuse for another fee. Victim keeps paying hoping to eventually receive the prize.",
+      "red_flags": [
+        "You cannot win a lottery you never entered — impossible",
+        "KBC selects contestants only through official registration",
+        "Any prize that requires upfront payment is always fraud",
+        "Government schemes never ask for GST or fees via SMS"
+      ],
+      "safety_tip": "Block and report the number immediately. No legitimate prize ever requires upfront payment.",
+      "total_loss_2024": "Rs 105 crore",
+      "source": "Cybercrime.gov.in Database 2024"
+    },
+    {
+      "type": "KYC_SCAM",
+      "icon": "🪪",
+      "color": "#d84315",
+      "label": "KYC Fraud",
+      "today_stat": "Paytm and HDFC KYC scam links spreading on WhatsApp now",
+      "real_case": {
+        "name": "Deepak Mishra",
+        "age": 41,
+        "city": "Bhopal",
+        "occupation": "Shopkeeper",
+        "amount_lost": "Rs 67,000",
+        "duration": "30 minutes",
+        "what_happened": "Got SMS with Paytm KYC link. Clicked the link and it looked exactly like Paytm website. Entered Aadhaar and OTP on the fake site. Rs 67000 from linked bank account transferred within minutes.",
+        "date": "November 2024"
+      },
+      "how_it_works": "Fake KYC websites that look identical to real apps. SMS with link claims account will be blocked. Victim enters Aadhaar plus OTP on fake site. Scammer uses these to complete fraudulent transactions.",
+      "red_flags": [
+        "Paytm KYC is always done inside the official app only",
+        "Check URL carefully — paytm-kyc.tk is NOT paytm.com",
+        "Never enter Aadhaar on any link received via SMS",
+        "Real KYC never needs OTP and Aadhaar together"
+      ],
+      "safety_tip": "KYC is only done inside official apps. Never click SMS links for KYC updates.",
+      "total_loss_2024": "Rs 456 crore",
+      "source": "NPCI KYC Fraud Alert 2024"
+    }
+  ]
+}
