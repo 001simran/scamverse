@@ -23,16 +23,24 @@ app = FastAPI(
 
 # ================= CORS FIX =================
 
-# 🔥 Allow your deployed frontend + local
+# 🔥 Dynamic CORS configuration for Railway deployment
+FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "http://localhost:5173")
+
+# Build allowed origins list
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "https://scamverse-b8k4.vercel.app",  # ✅ ADD YOUR VERCEL URL
 ]
+
+# Add production frontend URL if set
+if FRONTEND_ORIGIN and FRONTEND_ORIGIN not in origins:
+    origins.append(FRONTEND_ORIGIN)
+
+print(f"✅ CORS enabled for: {origins}")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,   # ✅ strict but correct
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
