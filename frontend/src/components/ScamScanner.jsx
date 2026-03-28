@@ -68,15 +68,79 @@ export default function ScamScanner() {
 
   function simulateResult() {
     if (subTab === 'link') {
-        const isSuspicious = content.includes('.xyz') || content.includes('.click') || content.includes('verification')
+        const url = content.toLowerCase()
+        
+        // Suspicious TLDs
+        const suspiciousTlds = ['.xyz', '.click', '.tk', '.ml', '.ga', '.cf', '.top', '.rocks']
+        const hasSuspiciousTld = suspiciousTlds.some(tld => url.includes(tld))
+        
+        // Scam keywords in domain
+        const scamKeywords = [
+            '99-rupees', '99rupees', 'free-', 'freee', 'urgent-', 'limited-offer',
+            'win-prize', 'jackpot', 'lottery', 'verified-', 'confirm-account',
+            'update-payment', 'update-account', 'verify-sbi', 'verify-bank',
+            'secure-account', 'unlock-', 'claim-reward', 'bonus-cash',
+            'easy-money', 'quick-cash', 'rupees', 'guaranteed', 'instant',
+            'cashback', 'reward', 'prize', 'emergency-payment', 'covid'
+        ]
+        const hasScamKeyword = scamKeywords.some(keyword => url.includes(keyword))
+        
+        // Impersonation patterns (domain name mimicking banks/companies)
+        const bankNames = ['sbi', 'hdfc', 'icici', 'axis', 'pnb', 'yes', 'kotak']
+        const companyNames = ['google', 'microsoft', 'amazon', 'apple', 'whatsapp', 'flipkart', 'ola', 'uber']
+        const impersonationDomain = bankNames.concat(companyNames).some(name => {
+            const pos = url.indexOf(name)
+            return pos > 0 && !url.includes(name + '.co.in') && !url.includes(name + '.com')
+        })
+        
+        // Suspicious patterns
+        const hasHttp = url.includes('http://') && !url.includes('https://')
+        const hasMultipleDashes = (url.match(/-/g) || []).length > 3
+        const hasNumbers = /\d{4,}/.test(url) // long number sequences
+        
+        const isSuspicious = hasSuspiciousTld || hasScamKeyword || impersonationDomain || 
+                           hasHttp || hasMultipleDashes || hasNumbers
+        
+        let flags = []
+        let confidence = 50
+        
+        if (hasSuspiciousTld) {
+            flags.push('Uses suspicious free/cheap domain extension')
+            confidence += 35
+        }
+        if (hasScamKeyword) {
+            flags.push('Domain contains common scam keywords (99-rupees, free, prize, etc.)')
+            confidence += 40
+        }
+        if (impersonationDomain) {
+            flags.push('Possible domain spoofing / bank/company impersonation')
+            confidence += 30
+        }
+        if (hasHttp) {
+            flags.push('Not using secure HTTPS protocol')
+            confidence += 15
+        }
+        if (hasMultipleDashes) {
+            flags.push('Excessive dashes typically used to hide scam intent')
+            confidence += 20
+        }
+        if (hasNumbers) {
+            flags.push('Contains suspicious number sequences')
+            confidence += 15
+        }
+        
+        if (flags.length === 0) {
+            flags = ['Verified Domain', 'Valid SSL', 'No suspicious patterns detected']
+        }
+        
         setResult({
             verdict: isSuspicious ? 'SCAM' : 'SAFE',
-            confidence: 92,
-            flags: isSuspicious ? ['Domain Spoofing', 'Unsecured TLD', 'Redirect loop detected'] : ['Verified Domain', 'Valid SSL'],
+            confidence: Math.min(confidence, 99),
+            flags,
             explanation: isSuspicious 
-                ? 'This link uses a suspicious domain designed to look like a real service. It likely leads to a phishing page.' 
+                ? 'This domain exhibits multiple scam indicators. It likely leads to phishing, fraud, or malware.' 
                 : 'This domain appears legitimate and matches known official service patterns.',
-            what_to_do: isSuspicious ? 'Do NOT click this link. Block the sender.' : 'Website appears safe, but still exercise caution with data.',
+            what_to_do: isSuspicious ? 'Do NOT click this link. Block the sender. Report to cybercrime.gov.in' : 'Website appears safe, but still exercise caution with data.',
             source: 'URL Pattern Analysis'
         })
     } else if (subTab === 'media') {

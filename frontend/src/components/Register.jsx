@@ -1,6 +1,6 @@
 // Register.jsx
 import React, { useState } from 'react'
-import { useAuth } from '../game/AuthContext'
+import { useAuth } from '../game/useAuth'
 
 function Register({ onSwitchToLogin }) {
   const [username, setUsername] = useState('')
@@ -27,8 +27,7 @@ function Register({ onSwitchToLogin }) {
     if (!result.success) {
       setError(result.error)
     } else {
-      alert('Registration successful! Please login.')
-      onSwitchToLogin()
+      onSwitchToLogin?.(result.username || username)
     }
   }
 
@@ -84,7 +83,7 @@ function Register({ onSwitchToLogin }) {
         </form>
         <p style={styles.switchText}>
           Already have an account?{' '}
-          <button onClick={onSwitchToLogin} style={styles.linkButton}>Login</button>
+          <button type="button" onClick={() => onSwitchToLogin?.()} style={styles.linkButton}>Login</button>
         </p>
       </div>
     </div>

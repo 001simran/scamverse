@@ -1,13 +1,19 @@
 // Login.jsx
-import React, { useState } from 'react'
-import { useAuth } from '../game/AuthContext'
+import React, { useState, useEffect } from 'react'
+import { useAuth } from '../game/useAuth'
+import { useGame } from '../game/GameContext'
 
-function Login({ onSwitchToRegister }) {
-  const [username, setUsername] = useState('')
+function Login({ onSwitchToRegister, initialUsername = '' }) {
+  const [username, setUsername] = useState(initialUsername || '')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()
+  const { setPlayer } = useGame()
+
+  useEffect(() => {
+    if (initialUsername) setUsername(initialUsername)
+  }, [initialUsername])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -18,7 +24,9 @@ function Login({ onSwitchToRegister }) {
     setLoading(false)
 
     if (!result.success) {
-      setError(result.error)
+      setError(result.error || 'Login failed. Please check your credentials.')
+    } else {
+      setPlayer(result.username || username)
     }
   }
 
@@ -54,7 +62,7 @@ function Login({ onSwitchToRegister }) {
         </form>
         <p style={styles.switchText}>
           Don't have an account?{' '}
-          <button onClick={onSwitchToRegister} style={styles.linkButton}>Register</button>
+          <button type="button" onClick={() => onSwitchToRegister?.()} style={styles.linkButton}>Register</button>
         </p>
       </div>
     </div>

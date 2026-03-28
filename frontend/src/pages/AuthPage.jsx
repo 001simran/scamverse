@@ -5,13 +5,22 @@ import Register from '../components/Register'
 
 function AuthPage() {
   const [isLogin, setIsLogin] = useState(true)
+  const [loginUsernameHint, setLoginUsernameHint] = useState('')
 
   return (
     <div className="auth-page">
       {isLogin ? (
-        <Login onSwitchToRegister={() => setIsLogin(false)} />
+        <Login
+          initialUsername={loginUsernameHint}
+          onSwitchToRegister={() => setIsLogin(false)}
+        />
       ) : (
-        <Register onSwitchToLogin={() => setIsLogin(true)} />
+        <Register
+          onSwitchToLogin={(name) => {
+            if (name) setLoginUsernameHint(name)
+            setIsLogin(true)
+          }}
+        />
       )}
     </div>
   )

@@ -426,7 +426,7 @@ export default function ScenarioModal({ building, onClose, npcName }) {
           </div>
         )}
 
-        {/* result after decision */}
+        {/* Learn Mode / Result after decision */}
         {decision && (
           <div style={{
             ...styles.result,
@@ -434,18 +434,42 @@ export default function ScenarioModal({ building, onClose, npcName }) {
             border: `1px solid ${isCorrect ? '#4caf5040' : '#f4433640'}`
           }}>
             <div style={{
+              background: isCorrect ? '#4caf5020' : '#f4433620',
+              padding: '8px 12px',
+              borderRadius: '8px',
               color: isCorrect ? '#4caf50' : '#f44336',
               fontWeight: 'bold',
               fontSize: '13px',
-              marginBottom: '6px'
+              marginBottom: '12px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
             }}>
-              {isCorrect ? '✅ CORRECT! +100 XP' : '❌ WRONG ANSWER'}
+              <span>{isCorrect ? '✅ THREAT NEUTRALIZED' : '❌ SECURITY BREACH'}</span>
+              <span style={{ fontSize: '11px' }}>{isCorrect ? '+100 XP' : '-15 Security'}</span>
             </div>
-            <div style={{ color: '#ccc', fontSize: '12px', lineHeight: '1.5' }}>
+            
+            <div style={{ color: '#4fc3f7', fontSize: '12px', fontWeight: 'bold', marginBottom: '8px' }}>
+              🧠 LEARN MODE: Why was this a scam?
+            </div>
+            
+            <div style={{ color: '#ccc', fontSize: '12px', lineHeight: '1.5', paddingLeft: '12px', borderLeft: '2px solid #4fc3f7' }}>
               {scenario.explanation}
             </div>
+            
+            {scenario.clues && scenario.clues.length > 0 && (
+              <div style={{ marginTop: '12px' }}>
+                <div style={{ color: '#aaa', fontSize: '11px', fontWeight: 'bold', marginBottom: '4px' }}>Key Indicators:</div>
+                <ul style={{ margin: 0, paddingLeft: '20px', color: '#ccc', fontSize: '11px', lineHeight: '1.4' }}>
+                  {scenario.clues.map((c, i) => (
+                    <li key={i}>{c}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             {scenario.source && (
-              <div style={{ color: '#666', fontSize: '10px', marginTop: '6px' }}>
+              <div style={{ color: '#666', fontSize: '10px', marginTop: '10px', fontStyle: 'italic' }}>
                 Source: {scenario.source}
               </div>
             )}
@@ -481,47 +505,55 @@ export default function ScenarioModal({ building, onClose, npcName }) {
                 </button>
               </div>
 
-              {/* decision buttons - disabled while typing */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
-                <button
-                  onClick={() => handleDecision('trust')}
-                  disabled={isTyping}
-                  style={{
-                    ...styles.decBtn,
-                    color: '#4caf50',
-                    borderColor: '#4caf5040',
-                    opacity: isTyping ? 0.5 : 1,
-                    cursor: isTyping ? 'not-allowed' : 'pointer'
-                  }}
-                >
-                  ✅ TRUST
-                </button>
-                <button
-                  onClick={() => handleDecision('ignore')}
-                  disabled={isTyping}
-                  style={{
-                    ...styles.decBtn,
-                    color: '#ff9800',
-                    borderColor: '#ff980040',
-                    opacity: isTyping ? 0.5 : 1,
-                    cursor: isTyping ? 'not-allowed' : 'pointer'
-                  }}
-                >
-                  🤔 IGNORE
-                </button>
-                <button
-                  onClick={() => handleDecision('report')}
-                  disabled={isTyping}
-                  style={{
-                    ...styles.decBtn,
-                    color: '#f44336',
-                    borderColor: '#f4433640',
-                    opacity: isTyping ? 0.5 : 1,
-                    cursor: isTyping ? 'not-allowed' : 'pointer'
-                  }}
-                >
-                  🚨 REPORT
-                </button>
+              {/* decision buttons - chat style wrapper */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ color: '#aaa', fontSize: '10px', textAlign: 'center', marginBottom: '2px' }}>
+                  Choose your response:
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+                  <button
+                    onClick={() => handleDecision('trust')}
+                    disabled={isTyping}
+                    style={{
+                      ...styles.decBtn,
+                      color: '#4caf50',
+                      background: 'rgba(76, 175, 80, 0.1)',
+                      borderColor: '#4caf5040',
+                      opacity: isTyping ? 0.5 : 1,
+                      cursor: isTyping ? 'not-allowed' : 'pointer'
+                    }}
+                  >
+                    ✅ TRUST
+                  </button>
+                  <button
+                    onClick={() => handleDecision('ignore')}
+                    disabled={isTyping}
+                    style={{
+                      ...styles.decBtn,
+                      color: '#ff9800',
+                      background: 'rgba(255, 152, 0, 0.1)',
+                      borderColor: '#ff980040',
+                      opacity: isTyping ? 0.5 : 1,
+                      cursor: isTyping ? 'not-allowed' : 'pointer'
+                    }}
+                  >
+                    🤔 IGNORE
+                  </button>
+                  <button
+                    onClick={() => handleDecision('report')}
+                    disabled={isTyping}
+                    style={{
+                      ...styles.decBtn,
+                      color: '#f44336',
+                      background: 'rgba(244, 67, 54, 0.1)',
+                      borderColor: '#f4433640',
+                      opacity: isTyping ? 0.5 : 1,
+                      cursor: isTyping ? 'not-allowed' : 'pointer'
+                    }}
+                  >
+                    🚨 REPORT
+                  </button>
+                </div>
               </div>
             </>
           ) : (

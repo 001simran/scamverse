@@ -1,12 +1,7 @@
-// AuthContext.jsx
-import React, { createContext, useContext, useState, useEffect } from 'react'
+// AuthContext.jsx — provider only (hook lives in useAuth.js for Vite Fast Refresh)
+import React, { useState, useEffect } from 'react'
+import { AuthContext } from './auth-context'
 import { login as apiLogin, register as apiRegister, logout as apiLogout } from '../utils/api'
-
-const AuthContext = createContext()
-
-export function useAuth() {
-  return useContext(AuthContext)
-}
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
@@ -15,7 +10,6 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (token) {
-      // In a real app, you'd validate the token with the server
       setUser({ token })
     }
     setLoading(false)
@@ -24,8 +18,9 @@ export function AuthProvider({ children }) {
   const login = async (username, password) => {
     try {
       const response = await apiLogin(username, password)
-      setUser({ username, token: response.access_token })
-      return { success: true }
+      const resolved = response.username || username
+      setUser({ username: resolved, token: response.access_token })
+      return { success: true, username: resolved }
     } catch (error) {
       return { success: false, error: error.response?.data?.detail || 'Login failed' }
     }
@@ -34,7 +29,9 @@ export function AuthProvider({ children }) {
   const register = async (username, email, password) => {
     try {
       await apiRegister(username, email, password)
-      return { success: true }
+      apiLogout()
+      setUser(null)
+      return { success: true, username }
     } catch (error) {
       return { success: false, error: error.response?.data?.detail || 'Registration failed' }
     }

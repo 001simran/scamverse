@@ -1,12 +1,13 @@
 // ScamVerse - HackMol 7.0
 // BazaarOffice.jsx - Bustling marketplace interface
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ScenarioModal from '../ScenarioModal'
 
 export default function BazaarOffice({ building, onClose }) {
   const [selectedNPC, setSelectedNPC] = useState(null)
   const [showScenario, setShowScenario] = useState(false)
+  const [isExiting, setIsExiting] = useState(false)
 
   const NPCs = ['Vendor', 'Shopkeeper', 'Customer']
 
@@ -20,6 +21,13 @@ export default function BazaarOffice({ building, onClose }) {
     setSelectedNPC(null)
   }
 
+  function handleExit() {
+    setIsExiting(true)
+    setTimeout(() => {
+      onClose()
+    }, 300)
+  }
+
   if (showScenario && selectedNPC) {
     return (
       <ScenarioModal
@@ -31,8 +39,8 @@ export default function BazaarOffice({ building, onClose }) {
   }
 
   return (
-    <div style={styles.overlay}>
-      <div style={styles.container}>
+    <div style={{...styles.overlay, opacity: isExiting ? 0 : 1, transition: 'opacity 0.3s ease-out'}}>
+      <div style={{...styles.container, transform: isExiting ? 'scale(0.95)' : 'scale(1)', transition: 'transform 0.3s ease-out'}}>
         {/* Header */}
         <div style={styles.header}>
           <div>
@@ -46,7 +54,7 @@ export default function BazaarOffice({ building, onClose }) {
               Busy trading hub with merchants
             </div>
           </div>
-          <button onClick={onClose} style={styles.closeBtn}>✕</button>
+          <button onClick={handleExit} style={styles.closeBtn}>✕</button>
         </div>
 
         {/* Market Scene */}
@@ -112,7 +120,7 @@ export default function BazaarOffice({ building, onClose }) {
         </div>
 
         {/* Exit Button */}
-        <button onClick={onClose} style={styles.exitBtn}>
+        <button onClick={handleExit} style={{...styles.exitBtn, opacity: isExiting ? 0.5 : 1}}>
           ← Exit Bazaar
         </button>
       </div>

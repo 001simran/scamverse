@@ -21,10 +21,12 @@ const INTERIOR_CONFIGS = {
     width: 10,
     depth: 10,
     height: 3,
-    npcs: ['Mom', 'Sister'],
+    npcs: ['Mom', 'Sister', 'You (Victim of 1₹ Scam)'],
+    scamTypes: ['rupee_scam', 'phishing_email', 'love_scam'],
     furniture: [
       { type: 'sofa', x: 0, z: -2, emoji: '🛋️' },
-      { type: 'table', x: 0, z: 2, emoji: '🪑' }
+      { type: 'table', x: 0, z: 2, emoji: '🪑' },
+      { type: 'laptop', x: 2, z: 0, emoji: '📱' }
     ]
   },
   bank: {
@@ -36,14 +38,16 @@ const INTERIOR_CONFIGS = {
     width: 12,
     depth: 12,
     height: 4,
-    npcs: ['Bank Manager', 'Clerk', 'Security Guard'],
+    npcs: ['Bank Manager', 'Clerk - Digital Arrest Victim', 'Security Guard', 'Customer Facing Fraud'],
+    scamTypes: ['digital_arrest', 'refund_scam', 'upi_payment_scam', 'business_impersonation'],
     furniture: [
       { type: 'counter', x: -3, z: 0, emoji: '🏧' },
-      { type: 'desk', x: 3, z: 0, emoji: '💼' }
+      { type: 'desk', x: 3, z: 0, emoji: '💼' },
+      { type: 'vault', x: 0, z: 3, emoji: '🔒' }
     ]
   },
   bazaar: {
-    name: 'Local Bazaar',
+    name: 'Digital Marketplace - Main Bazaar',
     color: '#e65100',
     floorColor: 0xaa8855,
     wallColor: 0xffd700,
@@ -51,15 +55,17 @@ const INTERIOR_CONFIGS = {
     width: 14,
     depth: 14,
     height: 3,
-    npcs: ['Vendor', 'Shopkeeper', 'Customer'],
+    npcs: ['Vendor - Fake Products', 'Shopkeeper - 1₹ Scammer', 'Buyer #1 - Fooled', 'Buyer #2 - Smart'],
+    scamTypes: ['rupee_scam', 'lottery_prize_scam', 'upi_payment_scam'],
     furniture: [
       { type: 'stall', x: -4, z: -2, emoji: '🛒' },
       { type: 'stall', x: 4, z: -2, emoji: '🛒' },
-      { type: 'stall', x: 0, z: 4, emoji: '🛒' }
+      { type: 'stall', x: 0, z: 4, emoji: '🛒' },
+      { type: 'display', x: -2, z: 2, emoji: '📺' }
     ]
   },
   cybercell: {
-    name: 'Cyber Cell HQ',
+    name: 'Cyber Crime Cell HQ',
     color: '#4a148c',
     floorColor: 0x333333,
     wallColor: 0x222222,
@@ -67,15 +73,17 @@ const INTERIOR_CONFIGS = {
     width: 12,
     depth: 12,
     height: 4,
-    npcs: ['Officer', 'Detective', 'Tech Specialist'],
+    npcs: ['Officer Sharma', 'Detective - Tech Support Expert', 'Tech Specialist - Crypto Analyst'],
+    scamTypes: ['tech_support_scam', 'investment_scam', 'cryptocurrency_scam', 'digital_arrest'],
     furniture: [
       { type: 'desk', x: -3, z: -2, emoji: '💻' },
       { type: 'desk', x: 3, z: -2, emoji: '💻' },
-      { type: 'server', x: 0, z: 3, emoji: '🖥️' }
+      { type: 'server', x: 0, z: 3, emoji: '🖥️' },
+      { type: 'evidence', x: -3, z: 2, emoji: '📋' }
     ]
   },
   scamlab: {
-    name: 'Scam Lab',
+    name: 'Scam Research Lab',
     color: '#880e4f',
     floorColor: 0x555555,
     wallColor: 0x999999,
@@ -83,14 +91,16 @@ const INTERIOR_CONFIGS = {
     width: 10,
     depth: 10,
     height: 3,
-    npcs: ['Researcher', 'Analyst', 'Data Expert'],
+    npcs: ['Lead Researcher', 'Analyst - Romance Scam Expert', 'Data Expert'],
+    scamTypes: ['love_scam', 'fake_job_offer', 'investment_scam'],
     furniture: [
       { type: 'lab', x: -2, z: 0, emoji: '🔬' },
-      { type: 'lab', x: 2, z: 0, emoji: '🔬' }
+      { type: 'lab', x: 2, z: 0, emoji: '🔬' },
+      { type: 'whiteboard', x: 0, z: -3, emoji: '📊' }
     ]
   },
   awareness: {
-    name: 'Awareness Center',
+    name: 'Digital Safety Awareness Center',
     color: '#f57f17',
     floorColor: 0xddaa44,
     wallColor: 0xffbb33,
@@ -98,7 +108,8 @@ const INTERIOR_CONFIGS = {
     width: 11,
     depth: 11,
     height: 3,
-    npcs: ['Guide', 'Trainer'],
+    npcs: ['Trainer - 1₹ Scam Specialist', 'Guide - Digital Arrest Awareness', 'Educator'],
+    scamTypes: ['rupee_scam', 'digital_arrest', 'phishing_email', 'bad_job_offer', 'lottery_prize_scam'],
     furniture: [
       { type: 'board', x: 0, z: -3, emoji: '📋' },
       { type: 'seat', x: -3, z: 2, emoji: '🪑' },

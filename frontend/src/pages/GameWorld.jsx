@@ -10,6 +10,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { useGame } from '../game/GameContext'
 
 const BUILDINGS = [
   {
@@ -70,16 +71,16 @@ const BUILDINGS = [
 
 const TREE_POSITIONS = [
   [-20, -20], [-8, -20], [8, -20], [20, -20],
-  [-20, 0],   [20, 0],
-  [-20, 20],  [-8, 20],  [8, 20],  [20, 20],
-  [-5, -5],   [5, -5],   [-5, 5],  [5, 5]
+  [-20, 0], [20, 0],
+  [-20, 20], [-8, 20], [8, 20], [20, 20],
+  [-5, -5], [5, -5], [-5, 5], [5, 5]
 ]
 
 const LAMP_POSITIONS = [
   [-3, -12], [3, -12],
-  [-3, 12],  [3, 12],
+  [-3, 12], [3, 12],
   [-12, -3], [-12, 3],
-  [12, -3],  [12, 3]
+  [12, -3], [12, 3]
 ]
 
 export default function GameWorld({
@@ -88,27 +89,51 @@ export default function GameWorld({
   isElderMode = false
 }) {
 
-  const mountRef     = useRef(null)
-  const sceneRef     = useRef(null)
-  const rendererRef  = useRef(null)
-  const cameraRef    = useRef(null)
+  const mountRef = useRef(null)
+  const sceneRef = useRef(null)
+  const rendererRef = useRef(null)
+  const cameraRef = useRef(null)
   const characterRef = useRef(null)
-  const clockRef     = useRef(new THREE.Clock())
-  const keysRef      = useRef({})
+  const clockRef = useRef(new THREE.Clock())
+  const keysRef = useRef({})
   const animFrameRef = useRef(null)
   const nearBuildingRef = useRef(null)
+  const ambientLightRef = useRef(null)
+
+  const { state } = useGame()
+  const citySecurity = state.citySecurity || 50
 
   const partsRef = useRef({
     leftLeg: null, rightLeg: null,
     leftArm: null, rightArm: null,
-    body: null,    head: null
+    body: null, head: null
   })
 
   const [nearBuilding, setNearBuilding] = useState(null)
   const [webglSupported, setWebglSupported] = useState(true)
   const [loaded, setLoaded] = useState(false)
   const [debugKeys, setDebugKeys] = useState(null)
-  const [debugFocus, setDebugFocus] = useState(null)
+  const [showMissionStart, setShowMissionStart] = useState(true)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowMissionStart(false), 5000)
+    return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    if (!sceneRef.current || !ambientLightRef.current) return
+    const sec = Math.max(0, Math.min(100, citySecurity))
+    const ratio = sec / 100
+
+    // Smoothly transition between bright cyber blue (secure) to dark corrupted red (insecure)
+    const baseColor = new THREE.Color(0x220000).lerp(new THREE.Color(0x0a1a3a), ratio)
+    sceneRef.current.background = baseColor
+    if (sceneRef.current.fog) sceneRef.current.fog.color = baseColor
+
+    ambientLightRef.current.intensity = 0.4 + (ratio * 0.5)
+    const lightColor = new THREE.Color(0xff6666).lerp(new THREE.Color(0xffffff), ratio)
+    ambientLightRef.current.color = lightColor
+  }, [citySecurity, loaded])
 
   function checkWebGL() {
     try {
@@ -134,8 +159,8 @@ export default function GameWorld({
 
     // ── SCENE ────────────────────────────────────────────────
     const scene = new THREE.Scene()
-    scene.background = new THREE.Color(0x87ceeb)
-    scene.fog = new THREE.Fog(0x87ceeb, 25, 70)
+    scene.background = new THREE.Color(0x050510) // Dark cyber theme base
+    scene.fog = new THREE.FogExp2(0x050510, 0.03) // Thicker fog for dark aesthetic
     sceneRef.current = scene
 
     // ── CAMERA ───────────────────────────────────────────────
@@ -161,18 +186,19 @@ export default function GameWorld({
 
     // ── LIGHTS ───────────────────────────────────────────────
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.7)
+    ambientLightRef.current = ambientLight
     scene.add(ambientLight)
 
     const sunLight = new THREE.DirectionalLight(0xffffff, 0.9)
     sunLight.position.set(15, 25, 15)
     sunLight.castShadow = true
-    sunLight.shadow.mapSize.width  = 1024
+    sunLight.shadow.mapSize.width = 1024
     sunLight.shadow.mapSize.height = 1024
-    sunLight.shadow.camera.near   = 0.5
-    sunLight.shadow.camera.far    = 100
-    sunLight.shadow.camera.left   = -30
-    sunLight.shadow.camera.right  = 30
-    sunLight.shadow.camera.top    = 30
+    sunLight.shadow.camera.near = 0.5
+    sunLight.shadow.camera.far = 100
+    sunLight.shadow.camera.left = -30
+    sunLight.shadow.camera.right = 30
+    sunLight.shadow.camera.top = 30
     sunLight.shadow.camera.bottom = -30
     scene.add(sunLight)
 
@@ -204,8 +230,8 @@ export default function GameWorld({
 
     // ── ROADS ────────────────────────────────────────────────
     function makeRoad(x, y, z, w, h, d) {
-      const geo  = new THREE.BoxGeometry(w, h, d)
-      const mat  = new THREE.MeshLambertMaterial({ color: 0x424242 })
+      const geo = new THREE.BoxGeometry(w, h, d)
+      const mat = new THREE.MeshLambertMaterial({ color: 0x424242 })
       const mesh = new THREE.Mesh(geo, mat)
       mesh.position.set(x, y, z)
       mesh.receiveShadow = true
@@ -217,8 +243,8 @@ export default function GameWorld({
     makeRoad(0, 0.03, 0, 80, 0.06, 6)
 
     function makeRoadLine(x, z, w, d) {
-      const geo  = new THREE.BoxGeometry(w, 0.07, d)
-      const mat  = new THREE.MeshLambertMaterial({ color: 0xffd600 })
+      const geo = new THREE.BoxGeometry(w, 0.07, d)
+      const mat = new THREE.MeshLambertMaterial({ color: 0xffd600 })
       const mesh = new THREE.Mesh(geo, mat)
       mesh.position.set(x, 0.04, z)
       scene.add(mesh)
@@ -229,16 +255,16 @@ export default function GameWorld({
 
     const footpathMat = new THREE.MeshLambertMaterial({ color: 0x9e9e9e })
     function makeFootpath(x, y, z, w, h, d) {
-      const geo  = new THREE.BoxGeometry(w, h, d)
+      const geo = new THREE.BoxGeometry(w, h, d)
       const mesh = new THREE.Mesh(geo, footpathMat)
       mesh.position.set(x, y, z)
       mesh.receiveShadow = true
       scene.add(mesh)
     }
-    makeFootpath(0,   0.04,  3.5, 80, 0.05, 1)
-    makeFootpath(0,   0.04, -3.5, 80, 0.05, 1)
-    makeFootpath( 3.5, 0.04, 0,   1, 0.05, 80)
-    makeFootpath(-3.5, 0.04, 0,   1, 0.05, 80)
+    makeFootpath(0, 0.04, 3.5, 80, 0.05, 1)
+    makeFootpath(0, 0.04, -3.5, 80, 0.05, 1)
+    makeFootpath(3.5, 0.04, 0, 1, 0.05, 80)
+    makeFootpath(-3.5, 0.04, 0, 1, 0.05, 80)
 
     // ── BUILDINGS ────────────────────────────────────────────
     function makeBuildingNameSprite(labelText, baseWidth = 5) {
@@ -287,15 +313,15 @@ export default function GameWorld({
 
       const bodyGeo = new THREE.BoxGeometry(b.w, b.h, b.d)
       const bodyMat = new THREE.MeshLambertMaterial({ color: b.color })
-      const body    = new THREE.Mesh(bodyGeo, bodyMat)
-      body.position.y   = b.h / 2
-      body.castShadow   = true
+      const body = new THREE.Mesh(bodyGeo, bodyMat)
+      body.position.y = b.h / 2
+      body.castShadow = true
       body.receiveShadow = true
       group.add(body)
 
       const roofGeo = new THREE.BoxGeometry(b.w + 0.3, 0.4, b.d + 0.3)
       const roofMat = new THREE.MeshLambertMaterial({ color: b.roofColor })
-      const roof    = new THREE.Mesh(roofGeo, roofMat)
+      const roof = new THREE.Mesh(roofGeo, roofMat)
       roof.position.y = b.h + 0.2
       roof.castShadow = true
       group.add(roof)
@@ -306,13 +332,13 @@ export default function GameWorld({
         emissiveIntensity: 0.4
       })
 
-      const floors       = Math.floor(b.h / 1.5)
+      const floors = Math.floor(b.h / 1.5)
       const winsPerFloor = Math.floor(b.w / 2)
 
       for (let floor = 0; floor < floors; floor++) {
         for (let w = 0; w < winsPerFloor; w++) {
           const winGeo = new THREE.BoxGeometry(0.6, 0.7, 0.1)
-          const win    = new THREE.Mesh(winGeo, winMat)
+          const win = new THREE.Mesh(winGeo, winMat)
           const startX = -(b.w / 2) + 1.2 +
             w * (b.w - 1.5) / Math.max(winsPerFloor - 1, 1)
           win.position.set(startX, 1.0 + floor * 1.5, b.d / 2 + 0.05)
@@ -320,15 +346,15 @@ export default function GameWorld({
         }
       }
 
-      const doorGeo  = new THREE.BoxGeometry(0.8, 1.2, 0.1)
-      const doorMat  = new THREE.MeshLambertMaterial({ color: 0x5d4037 })
-      const door     = new THREE.Mesh(doorGeo, doorMat)
+      const doorGeo = new THREE.BoxGeometry(0.8, 1.2, 0.1)
+      const doorMat = new THREE.MeshLambertMaterial({ color: 0x5d4037 })
+      const door = new THREE.Mesh(doorGeo, doorMat)
       door.position.set(0, 0.6, b.d / 2 + 0.05)
       group.add(door)
 
       const frameGeo = new THREE.BoxGeometry(1.0, 1.4, 0.08)
       const frameMat = new THREE.MeshLambertMaterial({ color: 0x3e2723 })
-      const frame    = new THREE.Mesh(frameGeo, frameMat)
+      const frame = new THREE.Mesh(frameGeo, frameMat)
       frame.position.set(0, 0.7, b.d / 2 + 0.04)
       group.add(frame)
 
@@ -358,23 +384,23 @@ export default function GameWorld({
 
     // ── TREES ────────────────────────────────────────────────
     function makeTree(x, z) {
-      const group    = new THREE.Group()
+      const group = new THREE.Group()
       const trunkGeo = new THREE.CylinderGeometry(0.18, 0.22, 1.8, 6)
       const trunkMat = new THREE.MeshLambertMaterial({ color: 0x5d4037 })
-      const trunk    = new THREE.Mesh(trunkGeo, trunkMat)
-      trunk.position.y  = 0.9
-      trunk.castShadow  = true
+      const trunk = new THREE.Mesh(trunkGeo, trunkMat)
+      trunk.position.y = 0.9
+      trunk.castShadow = true
       group.add(trunk)
 
-      const colors  = [0x2e7d32, 0x388e3c, 0x43a047]
-      const sizes   = [1.8, 1.4, 0.9]
+      const colors = [0x2e7d32, 0x388e3c, 0x43a047]
+      const sizes = [1.8, 1.4, 0.9]
       const heights = [2.0, 2.8, 3.5]
 
       colors.forEach((col, i) => {
-        const geo  = new THREE.BoxGeometry(
+        const geo = new THREE.BoxGeometry(
           sizes[i] * 1.5, sizes[i], sizes[i] * 1.5
         )
-        const mat  = new THREE.MeshLambertMaterial({ color: col })
+        const mat = new THREE.MeshLambertMaterial({ color: col })
         const mesh = new THREE.Mesh(geo, mat)
         mesh.position.y = heights[i]
         mesh.castShadow = true
@@ -392,17 +418,17 @@ export default function GameWorld({
 
     // ── LAMP POSTS ───────────────────────────────────────────
     function makeLampPost(x, z) {
-      const group   = new THREE.Group()
+      const group = new THREE.Group()
       const poleMat = new THREE.MeshLambertMaterial({ color: 0x424242 })
 
       const poleGeo = new THREE.CylinderGeometry(0.07, 0.07, 4, 6)
-      const pole    = new THREE.Mesh(poleGeo, poleMat)
+      const pole = new THREE.Mesh(poleGeo, poleMat)
       pole.position.y = 2
       pole.castShadow = true
       group.add(pole)
 
       const armGeo = new THREE.CylinderGeometry(0.04, 0.04, 1, 5)
-      const arm    = new THREE.Mesh(armGeo, poleMat)
+      const arm = new THREE.Mesh(armGeo, poleMat)
       arm.rotation.z = Math.PI / 2
       arm.position.set(0.5, 3.8, 0)
       group.add(arm)
@@ -425,9 +451,9 @@ export default function GameWorld({
 
     // ── BENCHES ──────────────────────────────────────────────
     function makeBench(x, z) {
-      const group    = new THREE.Group()
+      const group = new THREE.Group()
       const brownMat = new THREE.MeshLambertMaterial({ color: 0x795548 })
-      const darkMat  = new THREE.MeshLambertMaterial({ color: 0x4e342e })
+      const darkMat = new THREE.MeshLambertMaterial({ color: 0x4e342e })
 
       const seat = new THREE.Mesh(
         new THREE.BoxGeometry(2.2, 0.12, 0.6), brownMat
@@ -441,13 +467,13 @@ export default function GameWorld({
       back.position.set(0, 0.9, -0.25)
       group.add(back)
 
-      ;[[-0.9,-0.25],[0.9,-0.25],[-0.9,0.25],[0.9,0.25]].forEach(([lx,lz]) => {
-        const leg = new THREE.Mesh(
-          new THREE.BoxGeometry(0.1, 0.55, 0.1), darkMat
-        )
-        leg.position.set(lx, 0.27, lz)
-        group.add(leg)
-      })
+        ;[[-0.9, -0.25], [0.9, -0.25], [-0.9, 0.25], [0.9, 0.25]].forEach(([lx, lz]) => {
+          const leg = new THREE.Mesh(
+            new THREE.BoxGeometry(0.1, 0.55, 0.1), darkMat
+          )
+          leg.position.set(lx, 0.27, lz)
+          group.add(leg)
+        })
 
       group.position.set(x, 0, z)
       scene.add(group)
@@ -460,38 +486,38 @@ export default function GameWorld({
     const cloudGroup = new THREE.Group()
 
     function makeCloud(x, y, z) {
-      const group    = new THREE.Group()
+      const group = new THREE.Group()
       const cloudMat = new THREE.MeshLambertMaterial({ color: 0xffffff })
 
-      ;[[0,0,0],[1.2,0.2,0],[-1.2,0.2,0],[0,0.3,0.8],[0,0.3,-0.8]]
-        .forEach(([cx, cy, cz]) => {
-          const size = 0.8 + Math.random() * 0.6
-          const geo  = new THREE.BoxGeometry(size*2, size, size*1.5)
-          const mesh = new THREE.Mesh(geo, cloudMat)
-          mesh.position.set(cx, cy, cz)
-          group.add(mesh)
-        })
+        ;[[0, 0, 0], [1.2, 0.2, 0], [-1.2, 0.2, 0], [0, 0.3, 0.8], [0, 0.3, -0.8]]
+          .forEach(([cx, cy, cz]) => {
+            const size = 0.8 + Math.random() * 0.6
+            const geo = new THREE.BoxGeometry(size * 2, size, size * 1.5)
+            const mesh = new THREE.Mesh(geo, cloudMat)
+            mesh.position.set(cx, cy, cz)
+            group.add(mesh)
+          })
 
       group.position.set(x, y, z)
       cloudGroup.add(group)
     }
 
     makeCloud(-20, 18, -15)
-    makeCloud(15,  20, -20)
-    makeCloud(-10, 22,  10)
-    makeCloud(20,  19,   5)
+    makeCloud(15, 20, -20)
+    makeCloud(-10, 22, 10)
+    makeCloud(20, 19, 5)
     scene.add(cloudGroup)
 
     // ── CHARACTER ────────────────────────────────────────────
     function makeCharacter() {
       const group = new THREE.Group()
 
-      const skinMat   = new THREE.MeshLambertMaterial({ color: 0xffcc80 })
-      const shirtMat  = new THREE.MeshLambertMaterial({ color: 0x1976d2 })
-      const pantsMat  = new THREE.MeshLambertMaterial({ color: 0x0d47a1 })
-      const eyeMat    = new THREE.MeshLambertMaterial({ color: 0x1a1a1a })
-      const phoneMat  = new THREE.MeshLambertMaterial({ color: 0x111111 })
-      const hairMat   = new THREE.MeshLambertMaterial({ color: 0x3e2723 })
+      const skinMat = new THREE.MeshLambertMaterial({ color: 0xffcc80 })
+      const shirtMat = new THREE.MeshLambertMaterial({ color: 0x1976d2 })
+      const pantsMat = new THREE.MeshLambertMaterial({ color: 0x0d47a1 })
+      const eyeMat = new THREE.MeshLambertMaterial({ color: 0x1a1a1a })
+      const phoneMat = new THREE.MeshLambertMaterial({ color: 0x111111 })
+      const hairMat = new THREE.MeshLambertMaterial({ color: 0x3e2723 })
       const screenMat = new THREE.MeshLambertMaterial({
         color: 0x4fc3f7, emissive: 0x4fc3f7, emissiveIntensity: 0.5
       })
@@ -594,7 +620,7 @@ export default function GameWorld({
       // shoes
       const shoeMat = new THREE.MeshLambertMaterial({ color: 0x212121 })
       const shoeGeo = new THREE.BoxGeometry(0.26, 0.12, 0.3)
-      const leftShoe  = new THREE.Mesh(shoeGeo, shoeMat)
+      const leftShoe = new THREE.Mesh(shoeGeo, shoeMat)
       leftShoe.position.set(-0.16, 0.06, 0.04)
       group.add(leftShoe)
       const rightShoe = new THREE.Mesh(shoeGeo, shoeMat)
@@ -613,7 +639,7 @@ export default function GameWorld({
     // ── NAME TAG ─────────────────────────────────────────────
     function makeNameTag(name) {
       const canvas = document.createElement('canvas')
-      canvas.width  = 256
+      canvas.width = 256
       canvas.height = 64
       const ctx = canvas.getContext('2d')
 
@@ -621,15 +647,15 @@ export default function GameWorld({
       ctx.roundRect(4, 4, 248, 56, 12)
       ctx.fill()
 
-      ctx.fillStyle    = '#ffffff'
-      ctx.font         = 'bold 28px Arial'
-      ctx.textAlign    = 'center'
+      ctx.fillStyle = '#ffffff'
+      ctx.font = 'bold 28px Arial'
+      ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
       ctx.fillText(name || 'Agent', 128, 32)
 
       const texture = new THREE.CanvasTexture(canvas)
-      const mat     = new THREE.SpriteMaterial({ map: texture, transparent: true })
-      const sprite  = new THREE.Sprite(mat)
+      const mat = new THREE.SpriteMaterial({ map: texture, transparent: true })
+      const sprite = new THREE.Sprite(mat)
       sprite.scale.set(2.5, 0.65, 1)
       sprite.position.set(0, 2.8, 0)
       characterRef.current.add(sprite)
@@ -650,7 +676,7 @@ export default function GameWorld({
     function makeNPC(index, startX, startZ) {
       const group = new THREE.Group()
       const colors = NPC_COLORS[index % 4]
-      
+
       const skinMat = new THREE.MeshLambertMaterial({ color: colors.skin })
       const shirtMat = new THREE.MeshLambertMaterial({ color: colors.shirt })
       const pantsMat = new THREE.MeshLambertMaterial({ color: colors.pants })
@@ -727,8 +753,8 @@ export default function GameWorld({
           spot.z + (Math.random() - 0.5) * 4
         )
         p.userData = {
-          baseY:  p.position.y,
-          speed:  0.3 + Math.random() * 0.5,
+          baseY: p.position.y,
+          speed: 0.3 + Math.random() * 0.5,
           offset: Math.random() * Math.PI * 2
         }
         scene.add(p)
@@ -738,7 +764,7 @@ export default function GameWorld({
 
     // ── KEYBOARD ─────────────────────────────────────────────
     const KEY_MAP = {
-      ArrowUp: 'up',    w: 'up',    W: 'up',
+      ArrowUp: 'up', w: 'up', W: 'up',
       ArrowDown: 'down', s: 'down', S: 'down',
       ArrowLeft: 'left', a: 'left', A: 'left',
       ArrowRight: 'right', d: 'right', D: 'right',
@@ -798,27 +824,27 @@ export default function GameWorld({
     window.addEventListener('keyup', onKeyUp)
 
     // ── GAME LOOP ─────────────────────────────────────────────
-    const SPEED    = 5.5
+    const SPEED = 5.5
     const BOUNDARY = 28
     let characterYaw = 0
 
     function animate() {
       animFrameRef.current = requestAnimationFrame(animate)
 
-      const delta   = clockRef.current.getDelta()
+      const delta = clockRef.current.getDelta()
       const elapsed = clockRef.current.getElapsedTime()
-      const char    = characterRef.current
-      const parts   = partsRef.current
-      const keys    = keysRef.current
+      const char = characterRef.current
+      const parts = partsRef.current
+      const keys = keysRef.current
 
       if (!char) return
 
       let moveX = 0
       let moveZ = 0
-      if (keys.up)    moveZ = -1
-      if (keys.down)  moveZ =  1
-      if (keys.left)  moveX = -1
-      if (keys.right) moveX =  1
+      if (keys.up) moveZ = -1
+      if (keys.down) moveZ = 1
+      if (keys.left) moveX = -1
+      if (keys.right) moveX = 1
 
       const isMoving = moveX !== 0 || moveZ !== 0
 
@@ -835,7 +861,7 @@ export default function GameWorld({
       if (isMoving) {
         const targetYaw = Math.atan2(moveX, moveZ)
         let diff = targetYaw - characterYaw
-        if (diff >  Math.PI) diff -= Math.PI * 2
+        if (diff > Math.PI) diff -= Math.PI * 2
         if (diff < -Math.PI) diff += Math.PI * 2
         characterYaw += diff * 10 * delta
         char.rotation.y = characterYaw
@@ -843,15 +869,15 @@ export default function GameWorld({
 
       if (isMoving) {
         const swing = Math.sin(elapsed * 8) * 0.55
-        if (parts.leftLeg)  parts.leftLeg.rotation.x  =  swing
+        if (parts.leftLeg) parts.leftLeg.rotation.x = swing
         if (parts.rightLeg) parts.rightLeg.rotation.x = -swing
-        if (parts.leftArm)  parts.leftArm.rotation.x  = -swing * 0.6
-        if (parts.rightArm) parts.rightArm.rotation.x =  swing * 0.6
+        if (parts.leftArm) parts.leftArm.rotation.x = -swing * 0.6
+        if (parts.rightArm) parts.rightArm.rotation.x = swing * 0.6
         char.position.y = Math.abs(Math.sin(elapsed * 8)) * 0.06
       } else {
-        if (parts.leftLeg)  parts.leftLeg.rotation.x  *= 0.85
+        if (parts.leftLeg) parts.leftLeg.rotation.x *= 0.85
         if (parts.rightLeg) parts.rightLeg.rotation.x *= 0.85
-        if (parts.leftArm)  parts.leftArm.rotation.x  =  Math.sin(elapsed * 1.5) * 0.06
+        if (parts.leftArm) parts.leftArm.rotation.x = Math.sin(elapsed * 1.5) * 0.06
         if (parts.rightArm) parts.rightArm.rotation.x = -Math.sin(elapsed * 1.5) * 0.06
         char.position.y = Math.sin(elapsed * 1.8) * 0.025
       }
@@ -860,7 +886,7 @@ export default function GameWorld({
       const camOffsetX = -Math.sin(characterYaw) * 9
       const camOffsetZ = -Math.cos(characterYaw) * 9
       camera.position.x += (char.position.x + camOffsetX - camera.position.x) * 0.07
-      camera.position.y += (char.position.y + 6.5        - camera.position.y) * 0.07
+      camera.position.y += (char.position.y + 6.5 - camera.position.y) * 0.07
       camera.position.z += (char.position.z + camOffsetZ - camera.position.z) * 0.07
       camera.lookAt(char.position.x, char.position.y + 1.0, char.position.z)
 
@@ -902,7 +928,7 @@ export default function GameWorld({
       particles.forEach(p => {
         p.position.y = p.userData.baseY +
           Math.sin(elapsed * p.userData.speed + p.userData.offset) * 0.6
-        p.material.opacity     = 0.4 + Math.sin(elapsed * 2 + p.userData.offset) * 0.3
+        p.material.opacity = 0.4 + Math.sin(elapsed * 2 + p.userData.offset) * 0.3
         p.material.transparent = true
       })
 
@@ -911,15 +937,15 @@ export default function GameWorld({
 
       // nearby building check
       let foundBuilding = null
-      let closestDist   = 999
+      let closestDist = 999
 
       BUILDINGS.forEach(b => {
-        const dx   = char.position.x - b.x
-        const dz   = char.position.z - b.z
+        const dx = char.position.x - b.x
+        const dz = char.position.z - b.z
         const dist = Math.sqrt(dx * dx + dz * dz)
         const threshold = Math.max(b.w, b.d) / 2 + 10
         if (dist < threshold && dist < closestDist) {
-          closestDist   = dist
+          closestDist = dist
           foundBuilding = b
         }
       })
@@ -976,7 +1002,7 @@ export default function GameWorld({
   }, [playerName])
 
   // ── DPAD HANDLERS ────────────────────────────────────────
-  function pressKey(key)   { keysRef.current[key] = true  }
+  function pressKey(key) { keysRef.current[key] = true }
   function releaseKey(key) { keysRef.current[key] = false }
 
   // ── WEBGL NOT SUPPORTED ──────────────────────────────────
@@ -1009,6 +1035,23 @@ export default function GameWorld({
         ref={mountRef}
         style={{ width: '100%', height: '100%', display: 'block' }}
       />
+
+      {/* mission start cutscene */}
+      {showMissionStart && (
+        <div style={{
+          position: 'absolute',
+          top: '20%', left: '50%',
+          transform: 'translate(-50%, -50%)',
+          color: '#4fc3f7', fontFamily: 'monospace', fontSize: '18px', fontWeight: 'bold',
+          textAlign: 'center', background: 'rgba(0,0,0,0.85)', padding: '20px 40px',
+          border: '1px solid #4fc3f7', borderRadius: '8px', pointerEvents: 'none', zIndex: 1000,
+          textShadow: '0 0 10px #4fc3f7'
+        }}>
+          &gt; SYNCING CYBER DEFENSE GRID...<br />
+          &gt; CITY SECURITY AT {citySecurity}%<br />
+          &gt; MISSION ASSIGNED.
+        </div>
+      )}
 
       {/* loading screen */}
       {!loaded && (
@@ -1060,27 +1103,20 @@ export default function GameWorld({
         </div>
       )}
 
-      {/* mini hud top left */}
-      <div style={{
-        position: 'absolute', top: '12px', left: '12px',
-        background: 'rgba(0,0,0,0.65)',
-        border: '1px solid #2a2a4a',
-        borderRadius: '12px', padding: '8px 12px',
-        color: '#fff', fontSize: '12px', zIndex: 10, lineHeight: '1.6'
-      }}>
-        <div style={{ color: '#4fc3f7', fontWeight: 'bold' }}>🛡️ ScamVerse</div>
-        {isElderMode ? (
-          <>
-            <div style={{ color: '#ff9800', fontSize: '11px' }}>👴 ELDER MODE</div>
-            <div style={{ color: '#aaa', fontSize: '11px' }}>बड़े बटन से चलें</div>
-          </>
-        ) : (
-          <>
-            <div style={{ color: '#aaa', fontSize: '11px' }}>WASD to move</div>
-            <div style={{ color: '#aaa', fontSize: '11px' }}>E or ⚡ to enter</div>
-          </>
-        )}
-      </div>
+      {/* mini hud top left (Disabled for Normal Mode - Handled by HUDNormal now) */}
+      {isElderMode && (
+        <div style={{
+          position: 'absolute', top: '12px', left: '12px',
+          background: 'rgba(0,0,0,0.65)',
+          border: '1px solid #2a2a4a',
+          borderRadius: '12px', padding: '8px 12px',
+          color: '#fff', fontSize: '12px', zIndex: 10, lineHeight: '1.6'
+        }}>
+          <div style={{ color: '#4fc3f7', fontWeight: 'bold' }}>🛡️ CyberGuardian</div>
+          <div style={{ color: '#ff9800', fontSize: '11px' }}>👴 ELDER MODE</div>
+          <div style={{ color: '#aaa', fontSize: '11px' }}>बड़े बटन से चलें</div>
+        </div>
+      )}
 
       {/* debug panel (add ?debugKeys=1 to URL) */}
       {debugKeys && (
@@ -1145,7 +1181,7 @@ export default function GameWorld({
             hint={isElderMode ? 'बायें' : null}
           />
           <div style={{
-            width:  isElderMode ? 60 : 44,
+            width: isElderMode ? 60 : 44,
             height: isElderMode ? 60 : 44,
             background: 'rgba(0,0,0,0.3)',
             borderRadius: '8px'
@@ -1176,14 +1212,14 @@ export default function GameWorld({
             }
           }}
           style={{
-            width:  isElderMode ? '86px' : '68px',
+            width: isElderMode ? '86px' : '68px',
             height: isElderMode ? '86px' : '68px',
             borderRadius: '50%',
             border: nearBuilding ? '3px solid #ffd700' : '2px solid #2a2a4a',
             background: nearBuilding
               ? 'rgba(255,152,0,0.9)'
               : 'rgba(0,0,0,0.5)',
-            color:  nearBuilding ? '#000' : '#555',
+            color: nearBuilding ? '#000' : '#555',
             fontSize: isElderMode ? '28px' : '24px',
             cursor: 'pointer',
             boxShadow: nearBuilding
@@ -1229,7 +1265,7 @@ function DpadBtn({ label, size = 44, hint = null, onDown, onUp }) {
       onPointerUp={onUp}
       onPointerLeave={onUp}
       style={{
-        width:  size, height: size,
+        width: size, height: size,
         background: 'rgba(0,0,0,0.7)',
         border: '1px solid #3a3a5a',
         borderRadius: '8px',

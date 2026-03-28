@@ -197,23 +197,77 @@ def analyze_with_keywords(message: str) -> dict:
                 "source": "Pattern Analysis"
             }
 
-    # check for suspicious URLs
-    suspicious_domains = [".tk", ".xyz", ".ml", ".ga", ".cf"]
-    for domain in suspicious_domains:
-        if domain in message_lower:
-            return {
-                "verdict": "SUSPICIOUS",
-                "confidence": 78,
-                "scam_type": "PHISHING",
-                "flags": [
-                    f"Suspicious domain {domain} detected in message",
-                    "Free domains are commonly used by scammers",
-                    "Real banks and companies use .com or .in domains"
-                ],
-                "explanation": f"Message contains suspicious {domain} domain link",
-                "what_to_do": "Do not click this link. Type the official URL directly.",
-                "source": "Pattern Analysis"
-            }
+    # check for suspicious URLs - enhanced detection
+    suspicious_domains = [".tk", ".xyz", ".ml", ".ga", ".cf", ".top", ".rocks"]
+    has_suspicious_tld = any(domain in message_lower for domain in suspicious_domains)
+    
+    # Scam keywords in domain
+    scam_keywords_in_domain = [
+        '99-rupees', '99rupees', 'free-', 'freee', 'urgent-', 'limited-offer',
+        'win-prize', 'jackpot', 'lottery', 'verified-', 'confirm-account',
+        'update-payment', 'update-account', 'verify-sbi', 'verify-bank',
+        'secure-account', 'unlock-', 'claim-reward', 'bonus-cash',
+        'easy-money', 'quick-cash', 'guaranteed', 'instant',
+        'cashback', 'reward', 'prize', 'emergency-payment', 'covid'
+    ]
+    has_scam_keyword = any(keyword in message_lower for keyword in scam_keywords_in_domain)
+    
+    # Impersonation patterns
+    bank_names = ['sbi', 'hdfc', 'icici', 'axis', 'pnb', 'yesbank', 'kotak']
+    company_names = ['google', 'microsoft', 'amazon', 'apple', 'whatsapp', 'flipkart', 'ola', 'uber']
+    impersonation = any(
+        name in message_lower and 
+        not any(official in message_lower for official in [f'{name}.co.in', f'{name}.com/{name}'])
+        for name in bank_names + company_names
+    )
+    
+    # Suspicious patterns
+    has_http_not_https = 'http://' in message_lower and 'https://' not in message_lower
+    has_multiple_dashes = message_lower.count('-') > 3
+    import re
+    has_long_numbers = bool(re.search(r'\d{4,}', message_lower))
+    
+    is_url_scam = has_suspicious_tld or has_scam_keyword or impersonation or has_http_not_https or has_multiple_dashes or has_long_numbers
+    
+    if is_url_scam:
+        flags = []
+        if has_suspicious_tld:
+            flags.append('Uses suspicious free/cheap domain extension')
+        if has_scam_keyword:
+            flags.append('Domain contains scam keywords (99-rupees, free, prize, etc.)')
+        if impersonation:
+            flags.append('Possible domain spoofing / bank impersonation')
+        if has_http_not_https:
+            flags.append('Not using secure HTTPS protocol')
+        if has_multiple_dashes:
+            flags.append('Excessive dashes used to hide scam intent')
+        if has_long_numbers:
+            flags.append('Contains suspicious number sequences')
+        
+        return {
+            "verdict": "SCAM",
+            "confidence": 85,
+            "scam_type": "PHISHING",
+            "flags": flags,
+            "explanation": "This URL exhibits multiple scam indicators and likely leads to phishing or fraud.",
+            "what_to_do": "Do not click this link. Type the official URL directly or visit the official app.",
+            "source": "URL Pattern Analysis"
+        }
+    
+    if has_suspicious_tld or any(domain in message_lower for domain in suspicious_domains):
+        return {
+            "verdict": "SUSPICIOUS",
+            "confidence": 78,
+            "scam_type": "PHISHING",
+            "flags": [
+                f"Suspicious domain detected in message",
+                "Free domains are commonly used by scammers",
+                "Real banks and companies use .com or .in domains"
+            ],
+            "explanation": f"Message contains suspicious domain link",
+            "what_to_do": "Do not click this link. Type the official URL directly.",
+            "source": "Pattern Analysis"
+        }
 
     # check for urgency words
     urgency_words = [

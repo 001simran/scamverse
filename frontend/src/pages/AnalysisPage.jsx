@@ -152,34 +152,75 @@ export default function AnalysisPage({ onClose }) {
     if (data) {
       setScanResult(data.analysis)
     } else {
-      // fallback url analysis
+      // fallback url analysis - ENHANCED
       let flags = []
       let risk = 0
 
       const url = urlInput.toLowerCase()
-      if (url.includes('.tk') || url.includes('.xyz') || url.includes('.ml')) {
-        flags.push('Suspicious domain extension (.tk, .xyz, .ml)')
+      
+      // Suspicious TLDs
+      const suspiciousTlds = ['.tk', '.xyz', '.ml', '.ga', '.cf', '.top', '.rocks']
+      if (suspiciousTlds.some(tld => url.includes(tld))) {
+        flags.push('Uses suspicious free/cheap domain extension')
         risk += 40
       }
+      
+      // URL shorteners
       if (url.includes('bit.ly') || url.includes('tinyurl') || url.includes('goo.gl')) {
-        flags.push('URL shortener detected')
+        flags.push('URL shortener detected - may hide malicious URL')
         risk += 30
       }
+      
+      // IP address instead of domain
       if (url.match(/^\d+\.\d+\.\d+\.\d+/)) {
-        flags.push('IP address instead of domain name')
+        flags.push('IP address used instead of domain name')
         risk += 50
       }
+      
+      // Not HTTPS
       if (url.includes('http://') && !url.includes('https://')) {
         flags.push('Not using secure HTTPS protocol')
         risk += 20
       }
-      if (url.includes('sbi') && !url.includes('sbi.co.in')) {
-        flags.push('Fake bank domain')
-        risk += 45
+      
+      // Bank impersonation
+      const bankNames = ['sbi', 'hdfc', 'icici', 'axis', 'pnb', 'yesbank', 'kotak']
+      for (let bank of bankNames) {
+        if (url.includes(bank) && !url.includes(bank + '.co.in') && !url.includes(bank + '.com')) {
+          flags.push(`Fake ${bank.toUpperCase()} domain - likely phishing`)
+          risk += 45
+          break
+        }
       }
-      if (url.includes('kbc') || url.includes('lottery')) {
-        flags.push('Lottery or prize related domain')
-        risk += 25
+      
+      // Scam keywords in domain
+      const scamPatterns = [
+        { pattern: /99[-]?rupees/i, flag: '99 rupees scam pattern detected', risk: 50 },
+        { pattern: /free[-]?cash|free[-]?money/i, flag: 'Free cash/money offer - classic scam', risk: 45 },
+        { pattern: /win[-]?prize|jackpot|lottery/i, flag: 'Lottery or prize claim - common scam', risk: 40 },
+        { pattern: /claim[-]?reward|bonus[-]?cash/i, flag: 'Reward/bonus claim - likely fraud', risk: 40 },
+        { pattern: /verify[-]?account|update[-]?payment|confirm[-]?identity/i, flag: 'Account verification phishing', risk: 50 },
+        { pattern: /urgent[-]?action|limited[-]?offer|act[-]?now/i, flag: 'Urgency tactics used to pressure users', risk: 35 }
+      ]
+      
+      for (let { pattern, flag, risk: riskAmount } of scamPatterns) {
+        if (pattern.test(url)) {
+          flags.push(flag)
+          risk += riskAmount
+          break
+        }
+      }
+      
+      // Excessive dashes
+      if ((url.match(/-/g) || []).length > 3) {
+        flags.push('Multiple dashes used to hide scam intent')
+        risk += 20
+      }
+      
+      // Long number sequences
+      if (/\d{4,}/.test(url)) {
+        flags.push('Suspicious number sequences in domain')
+        risk += 15
       }
 
       let verdict = 'SAFE'
@@ -188,9 +229,9 @@ export default function AnalysisPage({ onClose }) {
 
       setScanResult({
         verdict,
-        confidence: Math.min(risk + 15, 90),
-        flags,
-        what_to_do: verdict === 'HIGH RISK' ? 'Do not click. Report suspicious URL.' : 'Proceed with caution.',
+        confidence: Math.min(risk + 15, 95),
+        flags: flags.length > 0 ? flags : ['Domain appears safe', 'No obvious scam patterns detected'],
+        what_to_do: verdict === 'HIGH RISK' ? 'Do NOT click. Block and report suspicious URL.' : 'Proceed with caution. Verify with official website.',
         source: 'Pattern Analysis'
       })
     }
