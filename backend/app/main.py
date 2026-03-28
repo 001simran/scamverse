@@ -21,22 +21,31 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# ================= CORS FIX =================
+# ================= IMPROVED CORS FOR VERCEL + RAILWAY =================
 
-# 🔥 Dynamic CORS configuration for Railway deployment
-FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "http://localhost:5173")
+# Get environment variables
+FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "")
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "")
 
-# Build allowed origins list
+# Base origins (local development)
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
 
-# Add production frontend URL if set
-if FRONTEND_ORIGIN and FRONTEND_ORIGIN not in origins:
+# Add main frontend origin
+if FRONTEND_ORIGIN:
     origins.append(FRONTEND_ORIGIN)
+    print(f"✅ Added FRONTEND_ORIGIN: {FRONTEND_ORIGIN}")
 
-print(f"✅ CORS enabled for: {origins}")
+# Add additional allowed origins (comma-separated list)
+if ALLOWED_ORIGINS:
+    extra = [o.strip() for o in ALLOWED_ORIGINS.split(",") if o.strip()]
+    origins.extend(extra)
+    print(f"✅ Added ALLOWED_ORIGINS: {extra}")
+
+# Log all allowed origins
+print(f"🌐 CORS enabled for origins: {origins}")
 
 app.add_middleware(
     CORSMiddleware,
@@ -61,7 +70,8 @@ async def root():
     return {
         "message": "ScamVerse API is running",
         "version": "1.0.0",
-        "hackathon": "HackMol 7.0"
+        "hackathon": "HackMol 7.0",
+        "cors_origins": len(origins)
     }
 
 @app.get("/health")
