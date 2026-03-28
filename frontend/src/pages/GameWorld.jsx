@@ -100,8 +100,8 @@ export default function GameWorld({
   const nearBuildingRef = useRef(null)
   const ambientLightRef = useRef(null)
 
-  const { state } = useGame()
-  const citySecurity = state.citySecurity || 50
+  const { state, progressionData } = useGame()
+  const citySecurity = progressionData?.city?.securityLevel ?? 60
 
   const partsRef = useRef({
     leftLeg: null, rightLeg: null,

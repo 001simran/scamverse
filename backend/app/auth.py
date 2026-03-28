@@ -18,7 +18,7 @@ settings = get_settings()
 SECRET_KEY = settings.secret_key or os.getenv("SECRET_KEY") or "dev_fallback_secret"
 
 if SECRET_KEY == "dev_fallback_secret":
-    print("⚠️ WARNING: Using fallback SECRET_KEY")
+    print("WARNING: Using fallback SECRET_KEY")
 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes

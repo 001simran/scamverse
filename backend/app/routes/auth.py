@@ -108,15 +108,3 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
 @router.get("/me", response_model=UserResponse)
 def get_me(current_user: User = Depends(get_current_user)):
     return current_user
-def authenticate_user(db: Session, identifier: str, password: str):
-    user = db.query(User).filter(
-        (User.username == identifier) | (User.email == identifier)
-    ).first()
-
-    if not user:
-        return None
-
-    if not verify_password(password, user.hashed_password):
-        return None
-
-    return user

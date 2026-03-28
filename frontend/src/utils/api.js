@@ -1,4 +1,73 @@
-// Add this after your existing exports
+import axios from "axios";
+
+// Default: backend on port 8001 (override with VITE_API_URL, e.g. http://127.0.0.1:8001)
+const apiRoot = (import.meta.env.VITE_API_URL || "http://127.0.0.1:8001").replace(/\/$/, "");
+
+const API = axios.create({
+  baseURL: `${apiRoot}/api`,
+});
+
+// 🔐 Attach token automatically
+API.interceptors.request.use((req) => {
+  const token = localStorage.getItem("token");
+
+  if (token) {
+    req.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return req;
+});
+
+// ✅ LOGIN
+export const login = async (username, password) => {
+  try {
+    const res = await API.post("/auth/login", {
+      username: username,
+      password: password,
+    });
+
+    localStorage.setItem("token", res.data.access_token);
+    return res.data;
+  } catch (error) {
+    console.error("Login error:", error);
+    throw error;
+  }
+};
+
+export const loginUser = login;
+
+// ✅ REGISTER
+export const register = async (username, email, password) => {
+  try {
+    const res = await API.post("/auth/register", {
+      username,
+      email,
+      password,
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Registration error:", error);
+    throw error;
+  }
+};
+
+export const registerUser = register;
+
+// ✅ LOGOUT
+export const logout = () => {
+  localStorage.removeItem("token");
+};
+
+// ✅ GET CURRENT USER
+export const getMe = async () => {
+  try {
+    const res = await API.get("/auth/me");
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    throw error;
+  }
+};
 
 // ✅ GET SPIN WHEEL SEGMENTS
 export const getSpinSegments = async () => {
@@ -7,7 +76,6 @@ export const getSpinSegments = async () => {
     return res.data;
   } catch (error) {
     console.error("Error fetching spin segments:", error);
-    // Return fallback data if API fails
     return [
       { id: 1, name: "10 Coins", value: 10, color: "#FFD700" },
       { id: 2, name: "20 Coins", value: 20, color: "#C0C0C0" },
@@ -32,7 +100,7 @@ export const submitSpin = async (result) => {
   }
 };
 
-// ✅ GET USER STATS (including coins, etc.)
+// ✅ GET USER STATS
 export const getUserStats = async () => {
   try {
     const res = await API.get("/user/stats");
@@ -42,7 +110,6 @@ export const getUserStats = async () => {
     throw error;
   }
 };
-// Add this after your other exports
 
 // ✅ ANALYZE MESSAGE FOR SCAM DETECTION
 export const analyzeMessage = async (message) => {
@@ -51,14 +118,15 @@ export const analyzeMessage = async (message) => {
     return res.data;
   } catch (error) {
     console.error("Error analyzing message:", error);
-    // Return fallback analysis result if API fails
     return {
       isScam: false,
       confidence: 0,
       riskLevel: "low",
       reasons: ["Unable to analyze message at this time"],
       scamScore: 0,
-      suggestions: ["Please try again later"]
+      suggestions: ["Please try again later"],
+      message: message,
+      timestamp: new Date().toISOString()
     };
   }
 };

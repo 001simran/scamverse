@@ -9,24 +9,20 @@ import { useState, useEffect, useRef } from 'react'
 import ScamScanner from '../components/ScamScanner'
 
 export default function ScamDNA({ onClose }) {
-  const { state } = useGame()
+  const { state, progressionData } = useGame()
   const canvasRef = useRef(null)
   const [activeTab, setActiveTab] = useState('dna') // dna | scanner
 
-  // safety checks for state values
-  const caught   = state?.caught || 0
-  const fellFor  = state?.fellFor || 0
-  const reported = state?.reported || 0
+  // Derive stats from professional progression system
+  const caught   = progressionData?.stats?.successfulMissions || 0
+  const fellFor  = progressionData?.stats?.failedMissions || 0
+  const reported = progressionData?.stats?.successfulMissions || 0 // Recommending reported as successful missions for DNA
   const total    = Math.max(1, caught + fellFor)
-  const accuracy = Math.round(((caught + reported) / total) * 100)
+  const accuracy = Math.round(((caught) / total) * 100)
 
-  // protection score calculation
-  const biasProfile = state?.biasProfile || {}
-  const biasTotal = Object.values(biasProfile).reduce((a, b) => a + b, 0)
-  const protection = Math.max(10, Math.min(100,
-    Math.round(100 - (biasTotal / total) * 30 + (caught / total) * 30)
-  ))
-
+  // protection score calculation based on city security
+  const protection = progressionData?.citySecurity || 50
+  
   const protColor = protection > 70 ? '#4caf50'
                   : protection > 40 ? '#ff9800'
                   : '#f44336'
@@ -118,10 +114,10 @@ export default function ScamDNA({ onClose }) {
       doc.setTextColor(79, 195, 247)
       doc.setFontSize(24)
       doc.setFont('helvetica', 'bold')
-      doc.text('SCAMVERSE', pageW / 2, 25, { align: 'center' })
+      doc.text('NETGUARDIAN', pageW / 2, 25, { align: 'center' })
       doc.setTextColor(255, 152, 0)
       doc.setFontSize(13)
-      doc.text('India ka Cyber Suraksha Game — HackMol 7.0', pageW / 2, 34, { align: 'center' })
+      doc.text('Professional Cyber Security Training — HackMol 7.0', pageW / 2, 34, { align: 'center' })
       doc.setDrawColor(42, 42, 74)
       doc.line(20, 40, pageW - 20, 40)
 
@@ -130,7 +126,7 @@ export default function ScamDNA({ onClose }) {
       doc.text('SCAM DNA REPORT', pageW / 2, 52, { align: 'center' })
       doc.setTextColor(200, 200, 200)
       doc.setFontSize(12)
-      doc.text(`Agent: ${state?.playerName || 'Unknown'}`, pageW / 2, 62, { align: 'center' })
+      doc.text(`Agent: ${state?.playerName || 'Guardian'}`, pageW / 2, 62, { align: 'center' })
       doc.text(`Date: ${new Date().toLocaleDateString('en-IN')}`, pageW / 2, 70, { align: 'center' })
       doc.line(20, 76, pageW - 20, 76)
 
@@ -153,11 +149,10 @@ export default function ScamDNA({ onClose }) {
       doc.setTextColor(255, 215, 0)
       doc.text('YOUR GAMEPLAY STATS', 20, 162)
       const statsList = [
-        ['Total Score', (state?.score || 0).toLocaleString()],
-        ['Level',       `${state?.level || 1} — ${state?.rank || 'Trainee'}`],
+        ['Total XP', (progressionData?.xp || 0).toLocaleString()],
+        ['Level',       `${progressionData?.level || 1} — ${progressionData?.rank?.name || 'Trainee'}`],
         ['Scams Caught', caught.toString()],
         ['Fell For',    fellFor.toString()],
-        ['Reported',    reported.toString()],
         ['Accuracy',    `${accuracy}%`],
       ]
       doc.setFontSize(11)
@@ -169,7 +164,7 @@ export default function ScamDNA({ onClose }) {
         doc.text(value, 120, yLine)
       })
 
-      doc.save(`ScamVerse_DNA_${state?.playerName || 'Agent'}_${Date.now()}.pdf`)
+      doc.save(`NetGuardian_DNA_${state?.playerName || 'Guardian'}_${Date.now()}.pdf`)
     } catch (err) {
       console.error('PDF generation collapsed:', err)
       alert('PDF generation failed.')
@@ -226,10 +221,10 @@ export default function ScamDNA({ onClose }) {
                 <div style={{ fontSize: '32px' }}>🕵️</div>
                 <div>
                   <div style={{ color: '#fff', fontWeight: 'bold', fontSize: '15px' }}>
-                    {state?.playerName || 'Agent'}
+                    {state?.playerName || 'Guardian'}
                   </div>
                   <div style={{ color: '#9c27b0', fontSize: '12px' }}>
-                    Level {state?.level || 1} — {state?.rank || 'Trainee'}
+                    Level {progressionData?.level || 1} — {progressionData?.rank?.name || 'Trainee'}
                   </div>
                 </div>
               </div>
@@ -239,19 +234,19 @@ export default function ScamDNA({ onClose }) {
                 <canvas ref={canvasRef} width={160} height={120} style={{ display: 'block', margin: '0 auto' }} />
                 <div style={{ textAlign: 'center', marginTop: '-10px' }}>
                   <div style={{ color: protColor, fontWeight: 'bold', fontSize: '15px' }}>{protLabel}</div>
-                  <div style={{ color: '#666', fontSize: '11px' }}>Score: {protection}/100</div>
+                  <div style={{ color: '#666', fontSize: '11px' }}>Security Index: {protection}/100</div>
                 </div>
               </div>
 
               {/* stats grid */}
               <div style={styles.statsGrid}>
                 {[
-                  [(state?.score || 0).toLocaleString(), 'Score',    '🏆', '#ffd700'],
+                  [(progressionData?.xp || 0).toLocaleString(), 'XP',    '🏆', '#ffd700'],
                   [caught,                             'Caught',   '🎯', '#4caf50'],
                   [reported,                           'Reported', '🚨', '#4fc3f7'],
                   [fellFor,                            'Fell For', '😰', '#f44336'],
                   [`${accuracy}%`,                    'Accuracy', '📊', '#9c27b0'],
-                  [state?.combo || 0,                  'Max Combo','🔥', '#ff9800'],
+                  [progressionData?.stats?.totalMissions || 0, 'Total','🏙️', '#ff9800'],
                 ].map(([val, label, icon, color]) => (
                   <div key={label} style={styles.statCard}>
                     <div style={{ fontSize: '18px' }}>{icon}</div>
@@ -260,6 +255,7 @@ export default function ScamDNA({ onClose }) {
                   </div>
                 ))}
               </div>
+
 
               {/* biases list */}
               <div style={styles.sectionTitle}>🧬 VULNERABILITY PROFILE</div>

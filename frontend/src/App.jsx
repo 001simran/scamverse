@@ -1,23 +1,30 @@
-// ScamVerse - NetGuardian
-// App.jsx - Main routing and app structure
+// NetGuardian - Hackathon Integration
+// App.jsx - Professional shell for 3D world, missions, and analytics
 
 import React, { useState, useEffect } from 'react'
 import { useGame } from './game/GameContext'
-import AuthPage from './pages/AuthPage'
 import GameWorld from './pages/GameWorld'
+import NetGuardianHUD from './components/NetGuardianHUD'
+import LearnMode from './components/LearnMode'
 import SpinWheelPage from './pages/SpinWheelPage'
 import ScamDNA from './pages/ScamDNA'
-import ImpactDashboard from './components/ImpactDashboard'
 import TransitionOverlay from './components/TransitionOverlay'
-import LearnMode from './components/LearnMode'
 import './App.css'
 
 function App() {
-  const { state, setView } = useGame()
-  const [showImpactDashboard, setShowImpactDashboard] = useState(false)
+  const { 
+    state, 
+    progression,
+    progressionData, 
+    setView, 
+    startMission, 
+    completeMission, 
+    closeLearnMode 
+  } = useGame()
+  
   const [isTransitioning, setIsTransitioning] = useState(false)
 
-  // Handle view transitions
+  // Handle view transitions with smooth overlay
   const handleViewChange = (newView) => {
     setIsTransitioning(true)
     setTimeout(() => {
@@ -26,55 +33,75 @@ function App() {
     }, 500)
   }
 
-  // Require a player name from login before showing the game shell
-  if (!state.playerName || state.currentView === 'auth') {
-    return <AuthPage />
+  // Handle building entry from 3D world
+  const handleEnterBuilding = (buildingId) => {
+    switch(buildingId) {
+      case 'home':
+        startMission('phishing_email')
+        break
+      case 'bazaar':
+        startMission('rupee_scam')
+        break
+      case 'bank':
+        startMission('refund_scam')
+        break
+      case 'cybercell':
+        startMission('digital_arrest')
+        break
+      case 'awareness':
+        handleViewChange('spin')
+        break
+      case 'scamlab':
+        handleViewChange('dna')
+        break
+      default:
+        console.log("No mission for building:", buildingId)
+    }
   }
 
   return (
     <div className="app-container">
-      {/* Main Game View */}
+      {/* 3D Game World Layers */}
       <div className={`view-container ${isTransitioning ? 'transitioning' : ''}`}>
-        {state.currentView === 'title' && (
-          <GameWorld onViewChange={handleViewChange} />
+        {(state.currentView === 'game' || state.currentView === 'title') && (
+          <GameWorld 
+            playerName={state.playerName}
+            onEnterBuilding={handleEnterBuilding} 
+          />
         )}
-        {state.currentView === 'game' && (
-          <GameWorld onViewChange={handleViewChange} />
-        )}
+        
         {state.currentView === 'spin' && (
           <SpinWheelPage onViewChange={handleViewChange} />
         )}
+        
         {state.currentView === 'dna' && (
-          <ScamDNA onViewChange={handleViewChange} />
-        )}
-        {state.currentView === 'learn' && (
-          <LearnMode onViewChange={handleViewChange} />
+          <ScamDNA onClose={() => setView('game')} />
         )}
       </div>
 
-      {/* Impact Dashboard Modal */}
-      {showImpactDashboard && (
-        <ImpactDashboard 
-          userStats={state}
-          onClose={() => setShowImpactDashboard(false)}
+      {/* Professional HUD Overlay */}
+      {(state.currentView === 'game' || state.currentView === 'title') && (
+        <NetGuardianHUD 
+          progression={progression}
+          currentMission={state.currentMission}
+          onMissionDecision={completeMission}
+        />
+      )}
+
+      {/* Educational Learn Mode Modal */}
+      {state.showLearnMode && (
+        <LearnMode 
+          scamContent={state.lastMissionResult?.learnMode || state.lastMissionResult}
+          missionResult={state.lastMissionResult}
+          onClose={closeLearnMode}
         />
       )}
 
       {/* Transition Effect */}
       {isTransitioning && <TransitionOverlay />}
-
-      {/* Impact Dashboard Toggle Button */}
-      {state.currentView === 'game' && state.currentView !== 'auth' && (
-        <button 
-          className="impact-dashboard-btn"
-          onClick={() => setShowImpactDashboard(true)}
-          title="View your impact statistics"
-        >
-          📊
-        </button>
-      )}
     </div>
   )
 }
 
 export default App
+

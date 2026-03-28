@@ -23,7 +23,7 @@ if is_sqlite:
         DATABASE_URL,
         connect_args={"check_same_thread": False}
     )
-    print("✅ Using SQLite database (local development)")
+    print("[db] Using SQLite database (local development)")
 else:
     # PostgreSQL specific configuration
     engine = create_engine(
@@ -33,7 +33,7 @@ else:
         pool_pre_ping=True,    # Check connection before using
         echo=False             # Set to True to see SQL queries (debug only)
     )
-    print("✅ Using PostgreSQL database (production)")
+    print("[db] Using PostgreSQL database (production)")
 
 # Create session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

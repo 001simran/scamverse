@@ -190,7 +190,7 @@ const FALLBACK_SEGMENTS = [
 ]
 
 export default function SpinWheelPage({ playerName }) {
-  const { dispatch } = useGame()
+  const { progression, updateProgression, setView } = useGame()
   const canvasRef   = useRef(null)
   const confettiRef = useRef(null)
 
@@ -347,8 +347,9 @@ export default function SpinWheelPage({ playerName }) {
 
         setResult(landed)
 
-        // give xp for spinning
-        dispatch({ type: 'CORRECT_ANSWER', payload: 50 })
+        // Give XP for spinning via professional progression system
+        progression.addXP(50)
+        updateProgression()
 
         // confetti
         launchConfetti()
@@ -722,8 +723,8 @@ export default function SpinWheelPage({ playerName }) {
             </button>
             <button
               onClick={() => {
-                // go back to game
-                dispatch({ type: 'SET_VIEW', payload: 'game' })
+                // go back to game using the new setView method
+                setView('game')
               }}
               style={{
                 flex: 1,
@@ -741,6 +742,7 @@ export default function SpinWheelPage({ playerName }) {
               🏙️ Back to City
             </button>
           </div>
+
 
           {/* emergency */}
           <div style={{

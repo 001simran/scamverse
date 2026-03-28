@@ -10,7 +10,7 @@ from . import models
 SECRET_KEY = os.getenv("SECRET_KEY", "dev_fallback_secret")
 
 if SECRET_KEY == "dev_fallback_secret":
-    print("⚠️ WARNING: SECRET_KEY not set, using fallback")
+    print("WARNING: SECRET_KEY not set, using fallback")
 
 # ✅ Create DB tables
 models.Base.metadata.create_all(bind=engine)
@@ -40,16 +40,16 @@ origins = [
 # Add main frontend origin
 if FRONTEND_ORIGIN:
     origins.append(FRONTEND_ORIGIN)
-    print(f"✅ Added FRONTEND_ORIGIN: {FRONTEND_ORIGIN}")
+    print(f"[cors] Added FRONTEND_ORIGIN: {FRONTEND_ORIGIN}")
 
 # Add additional allowed origins (comma-separated list)
 if ALLOWED_ORIGINS:
     extra = [o.strip() for o in ALLOWED_ORIGINS.split(",") if o.strip()]
     origins.extend(extra)
-    print(f"✅ Added ALLOWED_ORIGINS: {extra}")
+    print(f"[cors] Added ALLOWED_ORIGINS: {extra}")
 
 # Log all allowed origins
-print(f"🌐 CORS enabled for origins: {origins}")
+print(f"[cors] enabled for origins: {origins}")
 
 app.add_middleware(
     CORSMiddleware,
