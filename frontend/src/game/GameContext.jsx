@@ -9,10 +9,14 @@ const GameContext = createContext(null);
 
 export const INITIAL_STATE = {
   playerName: 'Guardian',
-  currentView: 'game', // 'title', 'game', 'spin', 'analysis', 'dna', 'scenario'
+  currentView: 'game', // 'title', 'game', 'spin', 'analysis', 'dna', 'scenario', 'deepfake', 'dashboard', 'leaderboard'
   currentMission: null,
   showLearnMode: false,
   lastMissionResult: null,
+  isElderMode: false,
+  showFailureCutscene: false,
+  failureData: null,
+  language: 'en', // 'en' or 'hi'
 };
 
 export const GameProvider = ({ children }) => {
@@ -59,6 +63,22 @@ export const GameProvider = ({ children }) => {
       }
     );
 
+    // If failed, trigger emotional cutscene instead of immediate learn mode
+    if (!decision.isCorrect) {
+      setGameState(prev => ({
+        ...prev,
+        showFailureCutscene: true,
+        failureData: {
+          scamType: prev.currentMission.id,
+          amountLost: Math.floor(Math.random() * 900000) + 100000 // Randomized high-impact number
+        },
+        lastMissionResult: decision, // Store for later
+        currentMission: null
+      }));
+      updateProgression();
+      return;
+    }
+
     // Check for achievements/rank ups
     progression.checkAndUnlockAchievements();
     updateProgression();
@@ -82,6 +102,28 @@ export const GameProvider = ({ children }) => {
     }));
   };
 
+  const closeFailureCutscene = () => {
+    setGameState(prev => ({
+      ...prev,
+      showFailureCutscene: false,
+      showLearnMode: true // Show educational content AFTER the emotional impact
+    }));
+  };
+
+  const toggleElderMode = () => {
+    setGameState(prev => ({
+      ...prev,
+      isElderMode: !prev.isElderMode
+    }));
+  };
+
+  const toggleLanguage = () => {
+    setGameState(prev => ({
+      ...prev,
+      language: prev.language === 'en' ? 'hi' : 'en'
+    }));
+  };
+
   const value = {
     ...gameState,
     state: gameState, // For backward compatibility with some components
@@ -91,6 +133,9 @@ export const GameProvider = ({ children }) => {
     startMission,
     completeMission,
     closeLearnMode,
+    closeFailureCutscene,
+    toggleElderMode,
+    toggleLanguage,
     updateProgression
   };
 

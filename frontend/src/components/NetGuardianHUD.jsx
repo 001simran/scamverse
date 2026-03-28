@@ -4,13 +4,68 @@
 import React, { useState, useEffect } from 'react'
 import './NetGuardianHUD.css'
 
-export default function NetGuardianHUD({ progression, currentMission, onMissionDecision }) {
+export default function NetGuardianHUD({ 
+  progression, 
+  currentMission, 
+  onMissionDecision,
+  setView,
+  isElderMode,
+  toggleElderMode,
+  language = 'en',
+  toggleLanguage
+}) {
   const [showXPFloatingText, setShowXPFloatingText] = useState(null)
   const [showLevelUpAnimation, setShowLevelUpAnimation] = useState(false)
 
   const rank = progression.getCurrentRankInfo()
   const city = progression.getCitySecurityState()
   const stats = progression.getMissionStats()
+
+  // ════════════════════════════════════════════════════════════
+  // LOCALIZATION
+  // ════════════════════════════════════════════════════════════
+  const t = {
+    en: {
+      citySecurity: '🌃 CITY SECURITY',
+      xpRank: 'Rank',
+      citizensSaved: 'Citizens Saved',
+      scamsStopped: 'Scams Stopped',
+      accuracy: 'Accuracy',
+      achievements: 'Achievements',
+      noMission: '🎯 No Active Mission',
+      noMissionSub: 'Start a new mission to defend DataCity!',
+      response: '🎯 YOUR RESPONSE',
+      sessionStats: '📊 SESSION STATS',
+      recentAch: '🎖️ RECENT ACHIEVEMENTS',
+      currentRank: '🏆 CURRENT RANK',
+      console: '🛠️ GUARDIAN CONSOLE',
+      elderModeOn: '🎤 ELDER MODE: ON',
+      elderModeOff: '👤 ELDER MODE: OFF',
+      langLabel: '🌍 LANGUAGE: EN',
+      tip: '💡 Tip: Analyze the scam message for red flags before deciding',
+      keyboard: 'Use A/B/C keys or click to respond'
+    },
+    hi: {
+      citySecurity: '🌃 शहर की सुरक्षा',
+      xpRank: 'रैंक',
+      citizensSaved: 'सुरक्षित नागरिक',
+      scamsStopped: 'हादसे रोके',
+      accuracy: 'सटीकता',
+      achievements: 'उपलब्धियां',
+      noMission: '🎯 कोई सक्रिय मिशन नहीं',
+      noMissionSub: 'शहर की रक्षा के लिए नया मिशन शुरू करें!',
+      response: '🎯 आपकी प्रतिक्रिया',
+      sessionStats: '📊 सत्र के आंकड़े',
+      recentAch: '🎖️ हाल की उपलब्धियां',
+      currentRank: '🏆 वर्तमान रैंक',
+      console: '🛠️ गार्जियन कंसोल',
+      elderModeOn: '🎤 बुजुर्ग मोड: चालू',
+      elderModeOff: '👤 बुजुर्ग मोड: बंद',
+      langLabel: '🌍 भाषा: हिंदी',
+      tip: '💡 सुझाव: निर्णय लेने से पहले संदेश को ध्यान से पढ़ें',
+      keyboard: 'प्रतिक्रिया के लिए A/B/C या क्लिक का उपयोग करें'
+    }
+  }[language];
 
   // ════════════════════════════════════════════════════════════
   // RENDER FUNCTIONS
@@ -24,7 +79,7 @@ export default function NetGuardianHUD({ progression, currentMission, onMissionD
     return (
       <div className="security-meter-container">
         <div className="security-label">
-          <span>🌃 CITY SECURITY</span>
+          <span>{t.citySecurity}</span>
           <span className={`security-state-${state}`}>{state}</span>
         </div>
         <div className="security-bar">
@@ -54,7 +109,7 @@ export default function NetGuardianHUD({ progression, currentMission, onMissionD
       <div className="xp-container">
         <div className="xp-header">
           <span>⚡ {rank.name}</span>
-          <span>Rank {rank.rankId}/5</span>
+          <span>{t.xpRank} {rank.rankId}/5</span>
         </div>
         <div className="xp-bar-container">
           <div className="xp-bar">
@@ -82,7 +137,7 @@ export default function NetGuardianHUD({ progression, currentMission, onMissionD
         <div className="stat-card">
           <div className="stat-icon">👥</div>
           <div className="stat-content">
-            <div className="stat-label">Citizens Saved</div>
+            <div className="stat-label">{t.citizensSaved}</div>
             <div className="stat-value">{stats.citizensSaved}</div>
           </div>
         </div>
@@ -90,7 +145,7 @@ export default function NetGuardianHUD({ progression, currentMission, onMissionD
         <div className="stat-card">
           <div className="stat-icon">🛑</div>
           <div className="stat-content">
-            <div className="stat-label">Scams Stopped</div>
+            <div className="stat-label">{t.scamsStopped}</div>
             <div className="stat-value">{stats.totalMissions}</div>
           </div>
         </div>
@@ -98,7 +153,7 @@ export default function NetGuardianHUD({ progression, currentMission, onMissionD
         <div className="stat-card">
           <div className="stat-icon">🎯</div>
           <div className="stat-content">
-            <div className="stat-label">Accuracy</div>
+            <div className="stat-label">{t.accuracy}</div>
             <div className="stat-value" style={{color: stats.totalMissions > 0 ? '#00FF41' : '#aaa'}}>
               {stats.accuracy}
             </div>
@@ -108,7 +163,7 @@ export default function NetGuardianHUD({ progression, currentMission, onMissionD
         <div className="stat-card">
           <div className="stat-icon">🏆</div>
           <div className="stat-content">
-            <div className="stat-label">Achievements</div>
+            <div className="stat-label">{t.achievements}</div>
             <div className="stat-value">{progression.achievements.length}</div>
           </div>
         </div>
@@ -119,9 +174,9 @@ export default function NetGuardianHUD({ progression, currentMission, onMissionD
   const renderMissionCard = () => {
     if (!currentMission) {
       return (
-        <div className="mission-card empty">
-          <div>🎯 No Active Mission</div>
-          <div className="mission-subtitle">Start a new mission to defend DataCity!</div>
+        <div className="mission-card empty compact">
+          <div className="mission-empty-title">{t.noMission}</div>
+          <div className="mission-subtitle">{t.noMissionSub}</div>
         </div>
       )
     }
@@ -154,7 +209,7 @@ export default function NetGuardianHUD({ progression, currentMission, onMissionD
 
     return (
       <div className="decision-panel">
-        <div className="decision-header">🎯 YOUR RESPONSE</div>
+        <div className="decision-header">{t.response}</div>
         <div className="decision-options">
           {currentMission.responseOptions.map((option) => (
             <button
@@ -193,6 +248,45 @@ export default function NetGuardianHUD({ progression, currentMission, onMissionD
           <div className="minimap-text">
             {stats.totalMissions}/50 missions
           </div>
+        </div>
+      </div>
+    )
+  }
+
+  const renderConsole = () => {
+    return (
+      <div className="info-card console-card">
+        <div className="info-header">{t.console}</div>
+        <div className="console-buttons">
+          <button 
+            className={`console-btn ${isElderMode ? 'active' : ''}`}
+            onClick={toggleElderMode}
+          >
+            {isElderMode ? t.elderModeOn : t.elderModeOff}
+          </button>
+          
+          {isElderMode && (
+             <button 
+              className="console-btn lang-toggle"
+              onClick={toggleLanguage}
+            >
+              {t.langLabel}
+            </button>
+          )}
+
+          <button 
+            className="console-btn"
+            onClick={() => setView('dashboard')}
+          >
+            📊 {language === 'en' ? 'IMPACT DASHBOARD' : 'प्रभाव डैशबोर्ड'}
+          </button>
+          
+          <button 
+            className="console-btn"
+            onClick={() => setView('leaderboard')}
+          >
+            🏆 {language === 'en' ? 'LEADERBOARD' : 'लीडरबोर्ड'}
+          </button>
         </div>
       </div>
     )
@@ -239,38 +333,38 @@ export default function NetGuardianHUD({ progression, currentMission, onMissionD
         {/* Right Panel - Additional Info */}
         <div className="hud-right-panel">
           <div className="info-card">
-            <div className="info-header">📊 SESSION STATS</div>
+            <div className="info-header">{t.sessionStats}</div>
             <div className="info-content">
               <div className="info-row">
-                <span>Missions:</span>
+                <span>{language === 'en' ? 'Missions' : 'मिशन'}:</span>
                 <span>{stats.totalMissions}</span>
               </div>
               <div className="info-row">
-                <span>Win Rate:</span>
+                <span>{language === 'en' ? 'Win Rate' : 'जीत की दर'}:</span>
                 <span>{stats.accuracy}</span>
               </div>
               <div className="info-row">
-                <span>Citizens Lost:</span>
+                <span>{language === 'en' ? 'Citizens Lost' : 'नागरिक खोए'}:</span>
                 <span style={{color: '#FF0055'}}>{stats.citizensLost}</span>
               </div>
             </div>
           </div>
 
           <div className="info-card">
-            <div className="info-header">🎖️ RECENT ACHIEVEMENTS</div>
+            <div className="info-header">{t.recentAch}</div>
             <div className="achievements-list">
               {progression.achievements.slice(-3).map((ach, idx) => (
                 <div key={idx} className="achievement-badge">
                   {ach.name && ach.name.substring(0, 2)}
                 </div>
               )) || (
-                <div className="no-achievements">Complete missions to unlock!</div>
+                <div className="no-achievements">{language === 'en' ? 'Complete missions to unlock!' : 'अनलॉक के लिए मिशन पूरा करें!'}</div>
               )}
             </div>
           </div>
 
           <div className="info-card rank-card">
-            <div className="info-header">🏆 CURRENT RANK</div>
+            <div className="info-header">{t.currentRank}</div>
             <div className="rank-display">
               <div className="rank-name">{rank.name}</div>
               <div className="rank-benefits">
@@ -280,13 +374,15 @@ export default function NetGuardianHUD({ progression, currentMission, onMissionD
               </div>
             </div>
           </div>
+
+          {renderConsole()}
         </div>
       </div>
 
       {/* Bottom - Action Help */}
       <div className="hud-footer">
-        <span>💡 Tip: Analyze the scam message for red flags before deciding</span>
-        <span className="keyboard-hint">Use A/B/C keys or click to respond</span>
+        <span>{t.tip}</span>
+        <span className="keyboard-hint">{t.keyboard}</span>
       </div>
     </div>
   )

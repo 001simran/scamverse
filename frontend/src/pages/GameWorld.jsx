@@ -86,6 +86,7 @@ const LAMP_POSITIONS = [
 export default function GameWorld({
   playerName,
   onEnterBuilding,
+  onNearBuilding,
   isElderMode = false
 }) {
 
@@ -98,6 +99,7 @@ export default function GameWorld({
   const keysRef = useRef({})
   const animFrameRef = useRef(null)
   const nearBuildingRef = useRef(null)
+  const lastAnnouncedRef = useRef(null)
   const ambientLightRef = useRef(null)
 
   const { state, progressionData } = useGame()
@@ -795,7 +797,7 @@ export default function GameWorld({
 
         // Enter building instantly on keydown to avoid missing quick taps
         if (mapped === 'enter' && nearBuildingRef.current && onEnterBuilding) {
-          onEnterBuilding(nearBuildingRef.current)
+          onEnterBuilding(nearBuildingRef.current.id)
           keysRef.current.enter = false
         }
       }
@@ -953,9 +955,19 @@ export default function GameWorld({
       nearBuildingRef.current = foundBuilding
       setNearBuilding(foundBuilding)
 
+      // Proximity Alert for Elder Mode
+      if (foundBuilding) {
+        if (lastAnnouncedRef.current !== foundBuilding.id) {
+          if (onNearBuilding) onNearBuilding(foundBuilding.id, foundBuilding.label.replace(/[^a-zA-Z0-9 ]/g, ''))
+          lastAnnouncedRef.current = foundBuilding.id
+        }
+      } else {
+        lastAnnouncedRef.current = null
+      }
+
       if (keys.enter && foundBuilding) {
         keys.enter = false
-        if (onEnterBuilding) onEnterBuilding(foundBuilding)
+        if (onEnterBuilding) onEnterBuilding(foundBuilding.id)
       }
 
       renderer.render(scene, camera)

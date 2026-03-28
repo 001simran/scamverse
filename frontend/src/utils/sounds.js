@@ -1,64 +1,164 @@
-// frontend/src/utils/sounds.js
-// no install needed - uses browser built in audio
+/**
+ * sounds.js
+ * Professional SFX utility for ScamVerse using Web Audio API
+ * Generates tones for success, failure, clicks, and language/voice events
+ * without needing local MP3 files.
+ *
+ * UPDATED:
+ *  - playLanguageSelect()  — short double-beep played when user picks Hindi or English
+ *  - playVoiceActivate()   — warm rising tone played when voice commands turn ON
+ *  - playVoiceDeactivate() — soft falling tone played when voice commands turn OFF
+ *  - playProximity()       — subtle chime when user approaches a building
+ */
 
-function playSound(type) {
-  const ctx = new (window.AudioContext || window.webkitAudioContext)()
-  const osc = ctx.createOscillator()
-  const gain = ctx.createGain()
-  osc.connect(gain)
-  gain.connect(ctx.destination)
-
-  if (type === 'correct') {
-    osc.frequency.setValueAtTime(523, ctx.currentTime)
-    osc.frequency.setValueAtTime(659, ctx.currentTime + 0.1)
-    osc.frequency.setValueAtTime(784, ctx.currentTime + 0.2)
-    gain.gain.setValueAtTime(0.3, ctx.currentTime)
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4)
-    osc.start(ctx.currentTime)
-    osc.stop(ctx.currentTime + 0.4)
+class SoundManager {
+  constructor() {
+    this.context = null;
+    this.isInitialized = false;
   }
 
-  if (type === 'wrong') {
-    osc.frequency.setValueAtTime(200, ctx.currentTime)
-    osc.frequency.setValueAtTime(150, ctx.currentTime + 0.2)
-    gain.gain.setValueAtTime(0.3, ctx.currentTime)
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4)
-    osc.start(ctx.currentTime)
-    osc.stop(ctx.currentTime + 0.4)
+  /** Must be called inside a user-gesture handler (click, keydown, etc.) */
+  init() {
+    if (this.isInitialized) return;
+    try {
+      this.context = new (window.AudioContext || window.webkitAudioContext)();
+      this.isInitialized = true;
+      console.log("SoundManager initialized");
+    } catch (e) {
+      console.error("Web Audio API not supported", e);
+    }
   }
 
-  if (type === 'levelup') {
-    const notes = [523, 659, 784, 1047]
-    notes.forEach((freq, i) => {
-      const o = ctx.createOscillator()
-      const g = ctx.createGain()
-      o.connect(g)
-      g.connect(ctx.destination)
-      o.frequency.value = freq
-      g.gain.setValueAtTime(0.2, ctx.currentTime + i * 0.12)
-      g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.12 + 0.2)
-      o.start(ctx.currentTime + i * 0.12)
-      o.stop(ctx.currentTime + i * 0.12 + 0.2)
-    })
+  // ── Internal helpers ────────────────────────────────────────────────────────
+
+  /**
+   * Create and connect a simple oscillator → gain node, returning both so the
+   * caller can tweak frequencies/gains before triggering.
+   * @param {'sine'|'square'|'triangle'|'sawtooth'} type
+   * @returns {{ osc: OscillatorNode, gain: GainNode }}
+   */
+  _makeOscGain(type = 'sine') {
+    const osc = this.context.createOscillator();
+    const gain = this.context.createGain();
+    osc.type = type;
+    osc.connect(gain);
+    gain.connect(this.context.destination);
+    return { osc, gain };
   }
 
-  if (type === 'enter') {
-    osc.frequency.setValueAtTime(440, ctx.currentTime)
-    gain.gain.setValueAtTime(0.2, ctx.currentTime)
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15)
-    osc.start(ctx.currentTime)
-    osc.stop(ctx.currentTime + 0.15)
+  /** Shorthand: schedule osc start + stop and gain fade */
+  _play(osc, gain, startFreq, endFreq, peakGain, duration) {
+    const t = this.context.currentTime;
+    osc.frequency.setValueAtTime(startFreq, t);
+    if (endFreq !== startFreq) {
+      osc.frequency.exponentialRampToValueAtTime(endFreq, t + duration * 0.8);
+    }
+    gain.gain.setValueAtTime(peakGain, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+    osc.start(t);
+    osc.stop(t + duration);
   }
 
-  if (type === 'spin') {
-    osc.type = 'sawtooth'
-    osc.frequency.setValueAtTime(100, ctx.currentTime)
-    osc.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.3)
-    gain.gain.setValueAtTime(0.1, ctx.currentTime)
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3)
-    osc.start(ctx.currentTime)
-    osc.stop(ctx.currentTime + 0.3)
+  // ── Public sound effects ────────────────────────────────────────────────────
+
+  /**
+   * Success sound — high rising chime (correct answer / threat neutralised).
+   */
+  playSuccess() {
+    this.init();
+    if (!this.context) return;
+    const { osc, gain } = this._makeOscGain('sine');
+    this._play(osc, gain, 440, 880, 0.22, 0.6);
+  }
+
+  /**
+   * Failure sound — harsh falling buzz (wrong answer / security breach).
+   */
+  playFailure() {
+    this.init();
+    if (!this.context) return;
+    const { osc, gain } = this._makeOscGain('square');
+    this._play(osc, gain, 220, 80, 0.15, 0.6);
+  }
+
+  /**
+   * Click sound — crisp high tick (button presses, menu interactions).
+   */
+  playClick() {
+    this.init();
+    if (!this.context) return;
+    const { osc, gain } = this._makeOscGain('sine');
+    this._play(osc, gain, 1200, 1200, 0.06, 0.1);
+  }
+
+  /**
+   * Language select sound — two short upward beeps, played when user picks
+   * Hindi (H key) or English (E key).
+   *
+   * Usage:
+   *   soundManager.playLanguageSelect();   // call inside setLanguage() handler
+   */
+  playLanguageSelect() {
+    this.init();
+    if (!this.context) return;
+    const t = this.context.currentTime;
+
+    // First beep
+    const { osc: o1, gain: g1 } = this._makeOscGain('sine');
+    o1.frequency.setValueAtTime(600, t);
+    g1.gain.setValueAtTime(0.12, t);
+    g1.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+    o1.start(t);
+    o1.stop(t + 0.12);
+
+    // Second beep (slightly higher, slight delay)
+    const { osc: o2, gain: g2 } = this._makeOscGain('sine');
+    o2.frequency.setValueAtTime(800, t + 0.15);
+    g2.gain.setValueAtTime(0.12, t + 0.15);
+    g2.gain.exponentialRampToValueAtTime(0.001, t + 0.30);
+    o2.start(t + 0.15);
+    o2.stop(t + 0.30);
+  }
+
+  /**
+   * Voice activate sound — warm rising tone, played when voice commands turn ON.
+   *
+   * Usage:
+   *   soundManager.playVoiceActivate();   // call when mic starts listening
+   */
+  playVoiceActivate() {
+    this.init();
+    if (!this.context) return;
+    const { osc, gain } = this._makeOscGain('sine');
+    this._play(osc, gain, 300, 600, 0.14, 0.4);
+  }
+
+  /**
+   * Voice deactivate sound — soft falling tone, played when voice commands turn OFF.
+   *
+   * Usage:
+   *   soundManager.playVoiceDeactivate();  // call when mic stops
+   */
+  playVoiceDeactivate() {
+    this.init();
+    if (!this.context) return;
+    const { osc, gain } = this._makeOscGain('sine');
+    this._play(osc, gain, 500, 250, 0.12, 0.35);
+  }
+
+  /**
+   * Proximity chime — gentle triangle-wave ding when player nears a building.
+   *
+   * Usage:
+   *   soundManager.playProximity();   // call inside speakProximity()
+   */
+  playProximity() {
+    this.init();
+    if (!this.context) return;
+    const { osc, gain } = this._makeOscGain('triangle');
+    this._play(osc, gain, 880, 1100, 0.10, 0.5);
   }
 }
 
-export default playSound
+const soundManager = new SoundManager();
+export default soundManager;

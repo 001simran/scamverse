@@ -10,128 +10,123 @@ import BazaarOffice from '../components/offices/BazaarOffice'
 import CyberCellOffice from '../components/offices/CyberCellOffice'
 import ScamLabOffice from '../components/offices/ScamLabOffice'
 import AwarenessOffice from '../components/offices/AwarenessOffice'
+import { useGame } from '../game/GameContext'
+import { TRANSLATIONS } from '../utils/translations'
 
-const INTERIOR_CONFIGS = {
-  home: {
-    name: 'Your Apartment',
-    color: '#1565c0',
-    floorColor: 0x8b6f47,
-    wallColor: 0xf5deb3,
-    roofColor: 0x0d47a1,
-    width: 10,
-    depth: 10,
-    height: 3,
-    npcs: ['Mom', 'Sister', 'You (Victim of 1₹ Scam)'],
-    scamTypes: ['rupee_scam', 'phishing_email', 'love_scam'],
-    furniture: [
-      { type: 'sofa', x: 0, z: -2, emoji: '🛋️' },
-      { type: 'table', x: 0, z: 2, emoji: '🪑' },
-      { type: 'laptop', x: 2, z: 0, emoji: '📱' }
-    ]
-  },
-  bank: {
-    name: 'City Bank',
-    color: '#2e7d32',
-    floorColor: 0xcccccc,
-    wallColor: 0xffffff,
-    roofColor: 0x1b5e20,
-    width: 12,
-    depth: 12,
-    height: 4,
-    npcs: ['Bank Manager', 'Clerk - Digital Arrest Victim', 'Security Guard', 'Customer Facing Fraud'],
-    scamTypes: ['digital_arrest', 'refund_scam', 'upi_payment_scam', 'business_impersonation'],
-    furniture: [
-      { type: 'counter', x: -3, z: 0, emoji: '🏧' },
-      { type: 'desk', x: 3, z: 0, emoji: '💼' },
-      { type: 'vault', x: 0, z: 3, emoji: '🔒' }
-    ]
-  },
-  bazaar: {
-    name: 'Digital Marketplace - Main Bazaar',
-    color: '#e65100',
-    floorColor: 0xaa8855,
-    wallColor: 0xffd700,
-    roofColor: 0xbf360c,
-    width: 14,
-    depth: 14,
-    height: 3,
-    npcs: ['Vendor - Fake Products', 'Shopkeeper - 1₹ Scammer', 'Buyer #1 - Fooled', 'Buyer #2 - Smart'],
-    scamTypes: ['rupee_scam', 'lottery_prize_scam', 'upi_payment_scam'],
-    furniture: [
-      { type: 'stall', x: -4, z: -2, emoji: '🛒' },
-      { type: 'stall', x: 4, z: -2, emoji: '🛒' },
-      { type: 'stall', x: 0, z: 4, emoji: '🛒' },
-      { type: 'display', x: -2, z: 2, emoji: '📺' }
-    ]
-  },
-  cybercell: {
-    name: 'Cyber Crime Cell HQ',
-    color: '#4a148c',
-    floorColor: 0x333333,
-    wallColor: 0x222222,
-    roofColor: 0x38006b,
-    width: 12,
-    depth: 12,
-    height: 4,
-    npcs: ['Officer Sharma', 'Detective - Tech Support Expert', 'Tech Specialist - Crypto Analyst'],
-    scamTypes: ['tech_support_scam', 'investment_scam', 'cryptocurrency_scam', 'digital_arrest'],
-    furniture: [
-      { type: 'desk', x: -3, z: -2, emoji: '💻' },
-      { type: 'desk', x: 3, z: -2, emoji: '💻' },
-      { type: 'server', x: 0, z: 3, emoji: '🖥️' },
-      { type: 'evidence', x: -3, z: 2, emoji: '📋' }
-    ]
-  },
-  scamlab: {
-    name: 'Scam Research Lab',
-    color: '#880e4f',
-    floorColor: 0x555555,
-    wallColor: 0x999999,
-    roofColor: 0x560027,
-    width: 10,
-    depth: 10,
-    height: 3,
-    npcs: ['Lead Researcher', 'Analyst - Romance Scam Expert', 'Data Expert'],
-    scamTypes: ['love_scam', 'fake_job_offer', 'investment_scam'],
-    furniture: [
-      { type: 'lab', x: -2, z: 0, emoji: '🔬' },
-      { type: 'lab', x: 2, z: 0, emoji: '🔬' },
-      { type: 'whiteboard', x: 0, z: -3, emoji: '📊' }
-    ]
-  },
-  awareness: {
-    name: 'Digital Safety Awareness Center',
-    color: '#f57f17',
-    floorColor: 0xddaa44,
-    wallColor: 0xffbb33,
-    roofColor: 0xe65100,
-    width: 11,
-    depth: 11,
-    height: 3,
-    npcs: ['Trainer - 1₹ Scam Specialist', 'Guide - Digital Arrest Awareness', 'Educator'],
-    scamTypes: ['rupee_scam', 'digital_arrest', 'phishing_email', 'bad_job_offer', 'lottery_prize_scam'],
-    furniture: [
-      { type: 'board', x: 0, z: -3, emoji: '📋' },
-      { type: 'seat', x: -3, z: 2, emoji: '🪑' },
-      { type: 'seat', x: 3, z: 2, emoji: '🪑' }
-    ]
+const INTERIOR_CONFIGS = (lang = 'en') => {
+  const isHi = lang === 'hi';
+  return {
+    home: {
+      name: isHi ? 'आपका घर' : 'Your Apartment',
+      color: '#1565c0',
+      floorColor: 0x8b6f47,
+      wallColor: 0xf5deb3,
+      roofColor: 0x0d47a1,
+      width: 10,
+      depth: 10,
+      height: 3,
+      npcs: isHi ? ['माँ', 'बहन', 'आप (पीड़ित)'] : ['Mom', 'Sister', 'You (Victim)'],
+      scamTypes: ['rupee_scam', 'phishing_email', 'love_scam'],
+      furniture: [
+        { type: 'sofa', x: 0, z: -2, emoji: '🛋️' },
+        { type: 'table', x: 0, z: 2, emoji: '🪑' },
+        { type: 'laptop', x: 2, z: 0, emoji: '📱' }
+      ]
+    },
+    bank: {
+      name: isHi ? 'सिटी बैंक' : 'City Bank',
+      color: '#2e7d32',
+      floorColor: 0xcccccc,
+      wallColor: 0xffffff,
+      roofColor: 0x1b5e20,
+      width: 12,
+      depth: 12,
+      height: 4,
+      npcs: isHi ? ['बैंक मैनेजर', 'क्लर्क', 'सुरक्षा गार्ड'] : ['Bank Manager', 'Clerk', 'Security Guard'],
+      scamTypes: ['digital_arrest', 'refund_scam', 'upi_payment_scam', 'business_impersonation'],
+      furniture: [
+        { type: 'counter', x: -3, z: 0, emoji: '🏧' },
+        { type: 'desk', x: 3, z: 0, emoji: '💼' },
+        { type: 'vault', x: 0, z: 3, emoji: '🔒' }
+      ]
+    },
+    bazaar: {
+      name: isHi ? 'मुख्य बाज़ार' : 'Main Bazaar',
+      color: '#e65100',
+      floorColor: 0xaa8855,
+      wallColor: 0xffd700,
+      roofColor: 0xbf360c,
+      width: 14,
+      depth: 14,
+      height: 3,
+      npcs: isHi ? ['विक्रेता', 'दुकानदार', 'ग्राहक #1'] : ['Vendor', 'Shopkeeper', 'Buyer #1'],
+      scamTypes: ['rupee_scam', 'lottery_prize_scam', 'upi_payment_scam'],
+      furniture: [
+        { type: 'stall', x: -4, z: -2, emoji: '🛒' },
+        { type: 'stall', x: 4, z: -2, emoji: '🛒' },
+        { type: 'stall', x: 0, z: 4, emoji: '🛒' },
+        { type: 'display', x: -2, z: 2, emoji: '📺' }
+      ]
+    },
+    cybercell: {
+      name: isHi ? 'साइबर क्राइम सेल' : 'Cyber Crime Cell HQ',
+      color: '#4a148c',
+      floorColor: 0x333333,
+      wallColor: 0x222222,
+      roofColor: 0x38006b,
+      width: 12,
+      depth: 12,
+      height: 4,
+      npcs: isHi ? ['अधिकारी शर्मा', 'जासूस', 'टेक विशेषज्ञ'] : ['Officer Sharma', 'Detective', 'Tech Specialist'],
+      scamTypes: ['tech_support_scam', 'investment_scam', 'cryptocurrency_scam', 'digital_arrest'],
+      furniture: [
+        { type: 'desk', x: -3, z: -2, emoji: '💻' },
+        { type: 'desk', x: 3, z: -2, emoji: '💻' },
+        { type: 'server', x: 0, z: 3, emoji: '🖥️' },
+        { type: 'evidence', x: -3, z: 2, emoji: '📋' }
+      ]
+    },
+    scamlab: {
+      name: isHi ? 'स्कैम लेबोरेटरी' : 'Scam Research Lab',
+      color: '#880e4f',
+      floorColor: 0x555555,
+      wallColor: 0x999999,
+      roofColor: 0x560027,
+      width: 10,
+      depth: 10,
+      height: 3,
+      npcs: isHi ? ['मुख्य शोधकर्ता', 'एनालिस्ट', 'डेटा विशेषज्ञ'] : ['Lead Researcher', 'Analyst', 'Data Expert'],
+      scamTypes: ['love_scam', 'fake_job_offer', 'investment_scam'],
+      furniture: [
+        { type: 'lab', x: -2, z: 0, emoji: '🔬' },
+        { type: 'lab', x: 2, z: 0, emoji: '🔬' },
+        { type: 'whiteboard', x: 0, z: -3, emoji: '📊' }
+      ]
+    },
+    awareness: {
+      name: isHi ? 'जागरूकता केंद्र' : 'Safety Awareness Center',
+      color: '#f57f17',
+      floorColor: 0xddaa44,
+      wallColor: 0xffbb33,
+      roofColor: 0xe65100,
+      width: 11,
+      depth: 11,
+      height: 3,
+      npcs: isHi ? ['ट्रेनर', 'गाइड', 'शिक्षक'] : ['Trainer', 'Guide', 'Educator'],
+      scamTypes: ['rupee_scam', 'digital_arrest', 'phishing_email', 'bad_job_offer', 'lottery_prize_scam'],
+      furniture: [
+        { type: 'board', x: 0, z: -3, emoji: '📋' },
+        { type: 'seat', x: -3, z: 2, emoji: '🪑' },
+        { type: 'seat', x: 3, z: 2, emoji: '🪑' }
+      ]
+    }
   }
 }
 
 export default function BuildingInterior({ building, onClose, onNPCInteract }) {
-  console.log('BuildingInterior rendered for:', building?.id)
-  const mountRef = useRef(null)
-  const sceneRef = useRef(null)
-  const rendererRef = useRef(null)
-  const cameraRef = useRef(null)
-  const playerRef = useRef(null)
-  const clockRef = useRef(new THREE.Clock())
-  const keysRef = useRef({})
-  const animFrameRef = useRef(null)
-  const [selectedNPC, setSelectedNPC] = useState(null)
-  const [showModal, setShowModal] = useState(false)
-
-  const config = INTERIOR_CONFIGS[building?.id] || INTERIOR_CONFIGS.home
+  const { state } = useGame()
+  const t = TRANSLATIONS[state.language]
+  const config = INTERIOR_CONFIGS(state.language)[building?.id] || INTERIOR_CONFIGS(state.language).home
   
   // NPCs in interior
   const interiorNPCsRef = useRef([])
@@ -418,7 +413,6 @@ export default function BuildingInterior({ building, onClose, onNPCInteract }) {
 
   return (
     <div ref={mountRef} style={{ width: '100%', height: '100%', position: 'relative' }}>
-      {/* Exit hint */}
       <div style={{
         position: 'absolute',
         top: '16px', left: '16px',
@@ -431,10 +425,9 @@ export default function BuildingInterior({ building, onClose, onNPCInteract }) {
         fontWeight: 'bold'
       }}>
         🏠 {config.name}<br/>
-        <span style={{ fontSize: '11px', color: '#aaa' }}>WASD to move • E to exit</span>
+        <span style={{ fontSize: '11px', color: '#aaa' }}>{t.exitHint}</span>
       </div>
 
-      {/* NPCs List */}
       <div style={{
         position: 'absolute',
         bottom: '16px', right: '16px',
@@ -448,7 +441,7 @@ export default function BuildingInterior({ building, onClose, onNPCInteract }) {
         maxWidth: '200px'
       }}>
         <div style={{ fontWeight: 'bold', marginBottom: '8px', color: '#4fc3f7' }}>
-          👥 People Here
+          👥 {t.peopleHere}
         </div>
         {config.npcs.map((npc, idx) => (
           <div
@@ -475,7 +468,7 @@ export default function BuildingInterior({ building, onClose, onNPCInteract }) {
               e.target.style.borderColor = '#2a2a4a'
             }}
           >
-            {npc} → Click to talk
+            {npc} → {t.talkTo}
           </div>
         ))}
       </div>

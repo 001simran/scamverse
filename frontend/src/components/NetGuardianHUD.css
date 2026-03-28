@@ -612,3 +612,109 @@
 .hud-container::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(135deg, var(--secondary), var(--primary));
 }
+
+/* ════════════════════════════════════════════════════════════
+   GUARDIAN CONSOLE
+   ════════════════════════════════════════════════════════════ */
+
+.console-card {
+  border-color: var(--secondary);
+  background: linear-gradient(135deg, rgba(157, 0, 255, 0.1), rgba(10, 14, 39, 0.8));
+}
+
+.console-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.console-btn {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-primary);
+  padding: 10px;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.console-btn:hover {
+  background: rgba(0, 217, 255, 0.1);
+  border-color: var(--primary);
+  transform: translateX(4px);
+  box-shadow: 0 0 10px rgba(0, 217, 255, 0.2);
+}
+
+.console-btn.active {
+  background: rgba(0, 255, 65, 0.15);
+  border-color: var(--success);
+  color: var(--success);
+  box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+}
+
+.console-btn.active::before {
+  content: '●';
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@media (max-width: 1024px) {
+  .console-btn {
+    font-size: 13px;
+    padding: 14px;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   COMPACT & LOCALIZATION STYLES
+   ════════════════════════════════════════════════════════════ */
+
+.mission-card.empty.compact {
+  padding: 12px;
+  margin-bottom: 8px;
+  background: rgba(10, 14, 39, 0.6);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.mission-empty-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--primary);
+}
+
+.mission-card.empty.compact .mission-subtitle {
+  font-size: 10px;
+  margin: 0;
+  opacity: 0.7;
+}
+
+.lang-toggle {
+  background: rgba(157, 0, 255, 0.1) !important;
+  border-color: var(--secondary) !important;
+  color: var(--secondary) !important;
+  justify-content: center !important;
+  font-size: 12px !important;
+  letter-spacing: 1px;
+}
+
+.lang-toggle:hover {
+  background: var(--secondary) !important;
+  color: white !important;
+  box-shadow: 0 0 15px var(--secondary);
+}
