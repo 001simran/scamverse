@@ -1,0 +1,222 @@
+/* ScamBuilder.css - The Masterful Reverse-Scam Sandbox */
+
+.scam-builder-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+.scam-builder-wrapper {
+  background: linear-gradient(145deg, #111, #1a1a2e);
+  border: 2px solid #333;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 0 50px rgba(0, 217, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.sb-close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s;
+}
+.sb-close-btn:hover { color: #ff0055; transform: scale(1.1); }
+
+.sb-header {
+  padding: 30px 30px 20px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.sb-header h1 {
+  color: #00D9FF;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+.sb-header p {
+  color: #aaa;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.sb-steps-container {
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sb-step {
+  background: rgba(0,0,0,0.4);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #333;
+  transition: all 0.3s;
+  opacity: 0.5;
+}
+.sb-step.active { opacity: 1; border-color: #00D9FF; box-shadow: 0 0 20px rgba(0, 217, 255, 0.1); }
+.sb-step.completed { opacity: 0.8; border-color: #00FF41; }
+
+.sb-step h3 {
+  color: #fff;
+  font-size: 16px;
+  margin-bottom: 15px;
+}
+
+.sb-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sb-options button {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid #444;
+  color: #fff;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+.sb-options button:hover {
+  background: #00D9FF;
+  color: #000;
+  border-color: #00D9FF;
+  font-weight: bold;
+}
+
+.sb-chosen {
+  color: #00FF41;
+  font-weight: bold;
+  font-size: 14px;
+  padding: 10px;
+  background: rgba(0, 255, 65, 0.1);
+  border-radius: 8px;
+  border: 1px solid #00FF41;
+}
+
+.sb-deploy-btn {
+  background: #FF0055;
+  color: #fff;
+  font-weight: bold;
+  font-size: 18px;
+  padding: 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.pulse-anim { animation: danger-pulse 1.5s infinite; }
+@keyframes danger-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 0, 85, 0.7); }
+  70% { box-shadow: 0 0 0 15px rgba(255, 0, 85, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 0, 85, 0); }
+}
+
+/* RESULT SCREEN */
+.sb-result-container {
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.text-danger { color: #FF0055; font-size: 24px; margin-bottom: 15px; }
+.sb-explain { color: #ccc; margin-bottom: 30px; font-size: 15px; line-height: 1.5; }
+
+.sb-fake-phone {
+  width: 300px;
+  background: #000;
+  border-radius: 30px;
+  border: 8px solid #444;
+  overflow: hidden;
+  margin-bottom: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+}
+
+.sb-phone-header {
+  background: #075e54;
+  color: #fff;
+  padding: 15px;
+  font-weight: bold;
+  text-align: center;
+  font-size: 16px;
+}
+
+.sb-phone-body {
+  background: #e5ddd5;
+  padding: 20px;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sb-phone-bubble {
+  background: #fff;
+  color: #000;
+  padding: 15px;
+  border-radius: 10px;
+  border-top-left-radius: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.text-link { color: #0275d8; text-decoration: underline; }
+
+.sb-lesson {
+  background: rgba(0, 217, 255, 0.1);
+  border-left: 5px solid #00D9FF;
+  padding: 20px;
+  text-align: left;
+  color: #fff;
+  font-size: 16px;
+  line-height: 1.5;
+  border-radius: 0 10px 10px 0;
+  margin-bottom: 30px;
+}
+
+.sb-finish-btn {
+  background: #00D9FF;
+  color: #000;
+  font-weight: bold;
+  font-size: 16px;
+  padding: 15px 40px;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.sb-finish-btn:hover { transform: scale(1.05); }
+
+.animate-slide-up {
+  animation: s-slide 0.5s ease-out forwards;
+}
+@keyframes s-slide {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}

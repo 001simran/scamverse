@@ -432,6 +432,31 @@ export default function SpinWheelPage({ playerName }) {
         }
       `}</style>
 
+      {/* top exit button */}
+      <button 
+        onClick={() => setView('game')}
+        style={{
+          position: 'absolute',
+          top: '20px',
+          right: '20px',
+          background: 'rgba(255, 0, 85, 0.1)',
+          border: '1px solid #FF0055',
+          borderRadius: '50%',
+          width: '40px',
+          height: '40px',
+          color: '#FF0055',
+          fontSize: '20px',
+          cursor: 'pointer',
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+        title="Exit to Game"
+      >
+        ✕
+      </button>
+
       {/* header */}
       <div style={{ textAlign: 'center', marginBottom: '16px' }}>
         <div style={{ color: '#ffd700', fontSize: '22px', fontWeight: 'bold' }}>

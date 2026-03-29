@@ -1,0 +1,282 @@
+/* PhoneSimulator.css - Hyper-realistic Phone Experience for ScamVerse */
+.phone-sim-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  backdrop-filter: blur(8px);
+}
+
+.phone-sim-wrap {
+  width: 100%;
+  max-width: 500px;
+  height: 95vh;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.phone-sim-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  padding: 0 10px;
+}
+
+.phone-sim-logo {
+  font-weight: bold;
+  color: #00D9FF;
+  letter-spacing: 1px;
+}
+
+.phone-sim-score {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-weight: bold;
+}
+
+.phone-sim-close {
+  background: #FF0055;
+  border: none;
+  color: white;
+  padding: 5px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.phone-sim-subtitle {
+  color: #aaa;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* PHONE FRAME */
+.phone-device {
+  flex: 1;
+  background: #000;
+  border: 8px solid #333;
+  border-radius: 40px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 50px rgba(0, 217, 255, 0.3);
+  display: flex;
+  flex-direction: column;
+}
+
+.phone-notch {
+  width: 150px;
+  height: 25px;
+  background: #333;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+  z-index: 10;
+}
+
+.phone-screen {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* INTRO SCREEN */
+.intro-screen {
+  background: linear-gradient(135deg, #1a1a2e 0%, #0f0c29 100%);
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  text-align: center;
+}
+
+.intro-badge { font-size: 80px; margin-bottom: 20px; }
+.intro-type { color: #00D9FF; font-weight: bold; font-size: 12px; margin-bottom: 10px; }
+.intro-title { color: white; font-size: 24px; font-weight: bold; margin-bottom: 20px; }
+.intro-desc { color: #ccc; font-size: 16px; margin-bottom: 40px; line-height: 1.5; }
+.intro-start-btn {
+  background: #00D9FF;
+  color: #000;
+  border: none;
+  padding: 15px 40px;
+  border-radius: 30px;
+  font-weight: bold;
+  font-size: 18px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.intro-start-btn:hover { transform: scale(1.05); }
+
+/* WHATSAPP UI */
+.whatsapp-screen { background: #e5ddd5; }
+.chat-header {
+  background: #075e54;
+  color: white;
+  padding: 40px 15px 15px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chat-avatar { font-size: 32px; background: white; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; }
+.chat-name { font-weight: bold; font-size: 16px; }
+.chat-number { font-size: 12px; opacity: 0.8; }
+.chat-no-tick { margin-left: auto; font-size: 10px; background: rgba(0,0,0,0.2); padding: 4px 8px; border-radius: 10px; }
+
+.chat-messages {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-bubble {
+  max-width: 85%;
+  padding: 10px 15px;
+  border-radius: 10px;
+  position: relative;
+  font-size: 14px;
+}
+
+.chat-bubble.them {
+  background: white;
+  align-self: flex-start;
+  border-top-left-radius: 0;
+  color: #000;
+}
+
+.chat-bubble.me {
+  background: #dcf8c6;
+  align-self: flex-end;
+  border-top-right-radius: 0;
+  color: #000;
+}
+
+.bubble-time { font-size: 10px; color: #888; text-align: right; margin-top: 5px; }
+
+.typing-indicator { align-self: flex-start; background: white; padding: 10px; border-radius: 20px; display: flex; gap: 5px; }
+.typing-indicator span { width: 6px; height: 6px; background: #999; border-radius: 50%; animation: blink 1.4s infinite both; }
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+/* CALL SCREEN */
+.call-screen {
+  background: #1a1a2e;
+  padding: 60px 20px;
+  align-items: center;
+  color: white;
+}
+
+.call-status { color: #00FF41; font-weight: bold; margin-bottom: 40px; font-family: monospace; }
+.caller-avatar { width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 60px; margin-bottom: 20px; border: 2px solid #00D9FF; }
+.caller-name { font-size: 24px; font-weight: bold; margin-bottom: 5px; }
+.caller-number { font-size: 14px; color: #aaa; margin-bottom: 40px; }
+
+.call-transcript {
+  width: 100%;
+  background: rgba(0,0,0,0.3);
+  border-radius: 15px;
+  padding: 15px;
+  font-size: 14px;
+  line-height: 1.6;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.call-line { margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px; }
+.call-time { color: #00D9FF; font-family: monospace; margin-right: 10px; }
+.call-buttons { display: flex; gap: 40px; margin-top: 40px; }
+.call-btn-decline { background: #FF0055; width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; color: white; border: none; cursor: pointer; }
+.call-btn-accept-fake { background: #00FF41; width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #000; font-weight: bold; }
+
+/* CHOICE OVERLAY */
+.choice-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(10, 10, 10, 0.98);
+  padding: 20px 20px 30px;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  border-top: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+  z-index: 20;
+  max-height: 85%;
+  overflow-y: auto;
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
+  animation: slide-up 0.5s cubic-bezier(0.1, 0.9, 0.2, 1);
+}
+
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.choice-title { color: #FF0055; font-weight: bold; margin-bottom: 15px; }
+.red-flags-list { color: #fff; margin-bottom: 30px; padding-left: 20px; font-size: 14px; }
+.red-flags-list li { margin-bottom: 10px; }
+.choice-question { color: #00D9FF; font-weight: bold; margin-bottom: 20px; text-align: center; }
+.choice-btn {
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  font-weight: bold;
+  text-align: left;
+  transition: all 0.2s;
+}
+
+.choice-safe { background: rgba(0, 255, 65, 0.1); border-color: #00FF41; color: #00FF41; }
+.choice-danger { background: rgba(255, 0, 85, 0.1); border-color: #FF0055; color: #FF0055; }
+.choice-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+
+/* RESULT SCREEN */
+.result-screen {
+  position: absolute;
+  inset: 0;
+  background: #1a1a2e;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.result-verdict { font-size: 32px; font-weight: bold; margin-bottom: 20px; }
+.verdict-safe { color: #00FF41; }
+.verdict-danger { color: #FF0055; }
+.result-feedback { color: white; font-size: 18px; margin-bottom: 30px; }
+.result-lesson { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; color: #ccc; margin-bottom: 40px; font-size: 14px; }
+.result-next-btn { background: #00D9FF; color: #000; padding: 15px 30px; border-radius: 30px; border: none; font-weight: bold; cursor: pointer; }
+
+/* COMPLETE SCREEN */
+.complete-screen { background: #0f0c29; padding: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; height: 100%; }
+.complete-emoji { font-size: 80px; margin-bottom: 20px; }
+.complete-title { color: #00D9FF; font-size: 32px; font-weight: bold; margin-bottom: 10px; }
+.complete-score { color: white; font-size: 48px; font-weight: bold; margin-bottom: 20px; }
+.complete-subtitle { color: #aaa; margin-bottom: 30px; }
+.complete-certificate { background: gold; color: #000; padding: 20px; border-radius: 10px; font-weight: bold; margin-bottom: 40px; border: 4px solid #fff; }
+.phone-sim-exit-btn { background: transparent; color: white; border: 1px solid white; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+
+@keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+.phone-sim-progress { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+.progress-dot { width: 10px; height: 10px; border-radius: 50%; background: #444; }
+.progress-dot.active { background: #00D9FF; box-shadow: 0 0 10px #00D9FF; }
+.progress-dot.done { background: #00FF41; }

@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import os
 
-from .routes import scenarios, ai_chat, spin, auth, progress
+from .routes import scenarios, ai_chat, spin, auth, progress, scanner
 from .database import engine
 from . import models
 
@@ -66,6 +66,7 @@ app.include_router(progress.router, prefix="/api/progress", tags=["Progress"])
 app.include_router(scenarios.router, prefix="/api/scenarios", tags=["Scenarios"])
 app.include_router(ai_chat.router, prefix="/api/ai", tags=["AI Chat"])
 app.include_router(spin.router, prefix="/api/spin", tags=["Spin Wheel"])
+app.include_router(scanner.router, prefix="/api/scanner", tags=["Scanner"])
 
 # ================= HEALTH =================
 

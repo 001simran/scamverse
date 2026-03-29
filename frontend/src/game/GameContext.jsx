@@ -9,14 +9,23 @@ const GameContext = createContext(null);
 
 export const INITIAL_STATE = {
   playerName: 'Guardian',
-  currentView: 'game', // 'title', 'game', 'spin', 'analysis', 'dna', 'scenario', 'deepfake', 'dashboard', 'leaderboard'
+  currentView: 'game', 
   currentMission: null,
   showLearnMode: false,
+  showDigitalArrest: false,
+  showInfoCorner: false,
+  showPhoneSim: false,
+  showScamBuilder: false,
+  showFamilyShield: false,
+  showCertificate: false,
+  certData: { score: 0, total: 4 },
+  stressLevel: 0, // 0 to 100
+  autoMoveTarget: null, // {x, z}
   lastMissionResult: null,
   isElderMode: false,
   showFailureCutscene: false,
   failureData: null,
-  language: 'en', // 'en' or 'hi'
+  language: 'en', 
 };
 
 export const GameProvider = ({ children }) => {
@@ -124,9 +133,24 @@ export const GameProvider = ({ children }) => {
     }));
   };
 
+  const openDigitalArrest = () => setGameState(prev => ({ ...prev, showDigitalArrest: true }));
+  const closeDigitalArrest = () => setGameState(prev => ({ ...prev, showDigitalArrest: false }));
+  const openInfoCorner = () => setGameState(prev => ({ ...prev, showInfoCorner: true }));
+  const closeInfoCorner = () => setGameState(prev => ({ ...prev, showInfoCorner: false }));
+  const openPhoneSim = () => setGameState(prev => ({ ...prev, showPhoneSim: true }));
+  const closePhoneSim = () => setGameState(prev => ({ ...prev, showPhoneSim: false }));
+  const openScamBuilder = () => setGameState(prev => ({ ...prev, showScamBuilder: true }));
+  const closeScamBuilder = () => setGameState(prev => ({ ...prev, showScamBuilder: false }));
+  const openFamilyShield = () => setGameState(prev => ({ ...prev, showFamilyShield: true }));
+  const closeFamilyShield = () => setGameState(prev => ({ ...prev, showFamilyShield: false }));
+  const openCertificate = (data) => setGameState(prev => ({ ...prev, showCertificate: true, certData: data || prev.certData }));
+  const closeCertificate = () => setGameState(prev => ({ ...prev, showCertificate: false }));
+  const setStress = (level) => setGameState(prev => ({ ...prev, stressLevel: level }));
+  const setAutoMoveTarget = (target) => setGameState(prev => ({ ...prev, autoMoveTarget: target }));
+
   const value = {
     ...gameState,
-    state: gameState, // For backward compatibility with some components
+    state: gameState, 
     progression,
     progressionData,
     setView,
@@ -134,6 +158,20 @@ export const GameProvider = ({ children }) => {
     completeMission,
     closeLearnMode,
     closeFailureCutscene,
+    openDigitalArrest,
+    closeDigitalArrest,
+    openInfoCorner,
+    closeInfoCorner,
+    openPhoneSim,
+    closePhoneSim,
+    openScamBuilder,
+    closeScamBuilder,
+    openFamilyShield,
+    closeFamilyShield,
+    openCertificate,
+    closeCertificate,
+    setStress,
+    setAutoMoveTarget,
     toggleElderMode,
     toggleLanguage,
     updateProgression

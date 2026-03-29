@@ -219,7 +219,8 @@ class VoiceCommandSystem {
       try {
         this.recognition.start();
         this.isListening = true;
-        this.speak(this._s('activated'));
+        // Disabled auto-speech on activation as per user request for "no input speech"
+        // this.speak(this._s('activated'));
       } catch (e) {
         console.error("Failed to start recognition:", e);
       }

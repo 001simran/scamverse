@@ -1513,6 +1513,156 @@ export const SCAMS = {
         "Check blockchain: etherscan.io (for Ethereum)"
       ]
     }
+  },
+
+  whatsapp_task_scam: {
+    id: "whatsapp_task_scam",
+    name: "WhatsApp Task (Like & Subscribe) Scam",
+    tier: 2,
+    category: "Easy Money",
+    difficulty: 2,
+    xpReward: 100,
+    securityImpact: 2,
+    description: "Earn money by liking YouTube videos, then coerced into 'VIP' investments",
+    victim: {
+      name: "Suresh",
+      age: 27,
+      profession: "Part-time worker",
+      avatar: "👨‍💻",
+      situation: "Added to a WhatsApp group for easy money"
+    },
+    scamMessage: `
+      💬 WhatsApp Group: "TASK TEAM-04"
+      
+      [ADMIN]: "Welcome! Work is simple. 
+      Like this YouTube video and send screenshot.
+      
+      Earn ₹50 per like!
+      Link: https://youtube.com/watch?v=XXXX
+      
+      Payment via UPI instantly!"
+      
+      [Suresh]: "I liked 3 videos and they sent me ₹150! It's real!"
+      
+      [ADMIN]: "Good! Now to enter VIP level (₹5,000/day), 
+      invest ₹2,000 for merchant trading. 
+      You will get ₹2,600 back in 15 mins!"
+    `,
+    redFlags: [
+      "No real job pays just for 'Liking' videos",
+      "Initial small payments (₹50-200) are bait to gain trust",
+      "Demands 'Investment' to unlock more work",
+      "Unknown WhatsApp group with fake screenshots of others' earnings",
+      "Pressure to move to Telegram for 'Merchant Tasks'"
+    ],
+    responseOptions: [
+      {
+        choice: "A",
+        text: "Exit group immediately. This is a classic 'Task' Ponzi scam.",
+        isCorrect: true,
+        feedback: "✅ CORRECT! They pay small amounts first to win your trust before stealing thousands.",
+        xpGain: 100,
+        securityGain: 3
+      },
+      {
+        choice: "B",
+        text: "Invest ₹2,000 once. If they pay ₹2,600 back, then continue.",
+        isCorrect: false,
+        feedback: "❌ WRONG! They might pay once, but they'll demand ₹20,000 next time and then block you.",
+        xpGain: 0,
+        securityGain: -3
+      },
+      {
+        choice: "C",
+        text: "Keep doing free tasks only, don't invest money.",
+        isCorrect: false,
+        feedback: "⚠️ WARNING! Even free tasks expose your UPI and phone number to a database of targets.",
+        xpGain: 50,
+        securityGain: 0
+      }
+    ],
+    learnMode: {
+      title: "The 'Like & Subscribe' Task Scam",
+      explanation: `
+        This represents the fastest growing digital fraud in India:
+        
+        THE TRAP (Phase 1):
+        • Small payouts (₹150-₹500) build massive trust.
+        • You feel like you've found a "money secret".
+        
+         THE KILL (Phase 2):
+        • Once hooked, they ask for "investment" (₹1k, ₹5k, ₹50k).
+        • They show fake dashboards with huge profits.
+        • When you try to withdraw, they ask for "tax payment" or "withdrawal fee".
+        • Result: Total loss of savings.
+      `
+    }
+  },
+
+  electricity_bill_scam: {
+    id: "electricity_bill_scam",
+    name: "Electricity Disconnection Scam",
+    tier: 2,
+    category: "Utility Fear",
+    difficulty: 2,
+    xpReward: 100,
+    securityImpact: 2,
+    description: "Urgent SMS claiming power will be cut tonight due to bill update failure",
+    victim: {
+      name: "Mrs. Khanna",
+      age: 62,
+      profession: "Homemaker",
+      avatar: "👵",
+      situation: "Received a scary SMS at 8:00 PM"
+    },
+    scamMessage: `
+      ⚠️ URGENT SMS ⚠️
+      
+      Dear Consumer, your electricity will be disconnected 
+      tonight at 9:30 PM due to last month's bill update 
+      failure.
+      
+      To avoid darkness, call our officer IMMEDIATELY at:
+      +91-98XXXXX542
+      
+      - State Electricity Board (DHBVN)
+    `,
+    redFlags: [
+      "Power boards never disconnect at night",
+      "Official SMS doesn't give a random mobile number to call",
+      "Power boards give multiple notices before disconnection",
+      "Urgency created near night-time (8 PM for 9:30 PM cut)"
+    ],
+    responseOptions: [
+      {
+        choice: "A",
+        text: "Ignore and verify bill status on official portal tomorrow morning.",
+        isCorrect: true,
+        feedback: "✅ CORRECT! These are fake numbers typically leading to AnyDesk scams.",
+        xpGain: 100,
+        securityGain: 3
+      },
+      {
+        choice: "B",
+        text: "Call the number immediately to explain you already paid.",
+        isCorrect: false,
+        feedback: "❌ WRONG! They will ask you to download a 'verification app' (AnyDesk) to steal money.",
+        xpGain: 0,
+        securityGain: -3
+      }
+    ],
+    learnMode: {
+      title: "The Utility Bill Panic Attack",
+      explanation: `
+         Scammers use "Fear of Darkness" to make you panic.
+         
+         THE SCAM:
+         1. You call the number in the SMS.
+         2. They ask you to download "QuickSupport" or "AnyDesk".
+         3. They see your screen and ask you to pay ₹10 for "verification".
+         4. They capture your UPI PIN and drain your account.
+      `
+    }
   }
 }
 
@@ -1529,6 +1679,8 @@ export const MISSION_SEQUENCE = [
   "rupee_scam",
   "fake_job_offer",
   "phishing_email",
+  "whatsapp_task_scam",
+  "electricity_bill_scam",
   "digital_arrest",
   "love_scam",
   "lottery_prize_scam",

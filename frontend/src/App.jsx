@@ -4,17 +4,34 @@
 import React, { useState, useEffect } from 'react'
 import { useGame } from './game/GameContext'
 import GameWorld from './pages/GameWorld'
+
+class GlobalErrorBoundary extends React.Component {
+  constructor(props) { super(props); this.state = { hasError: false, error: null }; }
+  static getDerivedStateFromError(error) { return { hasError: true, error }; }
+  render() {
+    if (this.state.hasError) return <div style={{padding: '50px', color: 'red', background: 'black', height: '100vh', zIndex: 99999, position: 'fixed'}}><h1>Application Crash</h1><p>{this.state.error?.toString()}</p></div>;
+    return this.props.children;
+  }
+}
+
 import NetGuardianHUD from './components/NetGuardianHUD'
 import LearnMode from './components/LearnMode'
 import SpinWheelPage from './pages/SpinWheelPage'
 import ScamDNA from './pages/ScamDNA'
 import TransitionOverlay from './components/TransitionOverlay'
-import DeepfakeChallenge from './components/DeepfakeChallenge'
+import ScamLab from './components/ScamLab'
 import ImpactDashboard from './components/ImpactDashboard'
 import FailureCutscene from './components/FailureCutscene'
 import PanicButton from './components/PanicButton'
 import CyberAmbassadorLeaderboard from './components/CyberAmbassadorLeaderboard'
+import ScamScanner from './components/ScamScanner'
 import VoiceCommandSystem from './utils/voiceCommands'
+import DigitalArrestLab from './components/DigitalArrestLab'
+import CyberInfoCorner from './components/CyberInfoCorner'
+import PhoneSimulator from './components/PhoneSimulator'
+import ScamBuilder from './components/ScamBuilder'
+import FamilyShield from './components/FamilyShield'
+import CyberShieldCertificate from './components/CyberShieldCertificate'
 import soundManager from './utils/sounds'
 import './App.css'
 
@@ -28,8 +45,22 @@ function App() {
     completeMission, 
     closeLearnMode,
     closeFailureCutscene,
+    openDigitalArrest,
+    closeDigitalArrest,
+    openInfoCorner,
+    closeInfoCorner,
+    openPhoneSim,
+    closePhoneSim,
+    openScamBuilder,
+    closeScamBuilder,
+    openFamilyShield,
+    closeFamilyShield,
+    openCertificate,
+    closeCertificate,
+    setStress,
     toggleElderMode,
-    toggleLanguage
+    toggleLanguage,
+    setAutoMoveTarget
   } = useGame()
 
   const [voiceSystem] = useState(() => new VoiceCommandSystem())
@@ -50,8 +81,9 @@ function App() {
   useEffect(() => {
     voiceSystem.setLanguage(state.language);
     
+    // In Elder mode, we don't 'listen' for commands, but we do use the speaker system
     if (state.isElderMode) {
-      voiceSystem.startListening();
+      voiceSystem.stopListening(); // Ensure listening is off as requested
       
       const handleVoiceStart = () => setView('game');
       const handleVoiceSelect = (e) => {
@@ -61,7 +93,7 @@ function App() {
             isCorrect: isYes === state.currentMission.isScam,
             xpGain: 100,
             securityGain: 5,
-            feedback: state.language === 'en' ? "Voice choice recorded." : "आवाज़ से चुनाव दर्ज किया गया।"
+            feedback: state.language === 'en' ? "Choice recorded." : "चुनाव दर्ज किया गया।"
           });
         }
       };
@@ -77,6 +109,63 @@ function App() {
       voiceSystem.stopListening();
     }
   }, [state.isElderMode, state.currentMission, state.language]);
+
+  // Voice confirmation for state changes (Accessibility)
+  useEffect(() => {
+    if (state.isElderMode) {
+      document.body.classList.add('elder-mode-active');
+      const msg = state.language === 'en' 
+        ? "Elder mode is now active. Text is larger and I will speak whatever you hover over." 
+        : "बुजुर्ग मोड अब सक्रिय है। लिखा हुआ बड़ा हो गया है और मैं हर चीज को पढ़कर सुनाऊँगी।";
+      voiceSystem.speak(msg);
+    } else {
+      document.body.classList.remove('elder-mode-active');
+    }
+  }, [state.isElderMode]);
+
+  useEffect(() => {
+    // Skip speech if not in elder mode
+    if (!state.isElderMode) return;
+    const msg = state.language === 'en' ? "Language changed to English." : "भाषा बदलकर अब हिंदी हो गई है।";
+    voiceSystem.speak(msg);
+  }, [state.language]);
+
+  // Handle TTS on hover globally
+  useEffect(() => {
+    if (!state.isElderMode) return;
+
+    const handleHover = (e) => {
+      const target = e.target;
+      // Find the nearest interactive or readable element
+      const interactive = target.closest('button, input, a, [data-tts], h1, h2, h3, p, li, span');
+      
+      if (interactive && interactive !== window._lastSpoken) {
+        // Priority: data-tts > aria-label > innerText > placeholder > title
+        const textToSpeak = interactive.getAttribute('data-tts') || 
+                           interactive.getAttribute('aria-label') || 
+                           interactive.innerText || 
+                           interactive.placeholder || 
+                           interactive.title ||
+                           interactive.value;
+
+        if (textToSpeak && textToSpeak.trim().length > 0) {
+          voiceSystem.speak(textToSpeak, { rate: 0.95 });
+          window._lastSpoken = interactive;
+        }
+      }
+    };
+
+    const handleLeave = () => {
+      window._lastSpoken = null;
+    };
+
+    document.addEventListener('mouseover', handleHover);
+    document.addEventListener('mouseout', handleLeave);
+    return () => {
+      document.removeEventListener('mouseover', handleHover);
+      document.removeEventListener('mouseout', handleLeave);
+    };
+  }, [state.isElderMode, state.language]);
 
   // Sound triggers for mission completion
   useEffect(() => {
@@ -108,8 +197,14 @@ function App() {
       case 'bank':
         startMission('refund_scam')
         break
+      case 'forensics':
+        openDigitalArrest();
+        break
       case 'cybercell':
         startMission('digital_arrest')
+        break
+      case 'infocenter':
+        openInfoCorner();
         break
       case 'awareness':
         handleViewChange('spin')
@@ -123,6 +218,7 @@ function App() {
   }
 
   return (
+    <GlobalErrorBoundary>
     <div className="app-container">
       {/* 3D Game World Layers */}
       <div className={`view-container ${isTransitioning ? 'transitioning' : ''}`}>
@@ -144,10 +240,10 @@ function App() {
         )}
 
         {state.currentView === 'deepfake' && (
-          <DeepfakeChallenge 
+          <ScamLab 
             onClose={() => setView('game')} 
             onComplete={() => {
-              progression.addXP(200);
+              progression.addXP(300); // 300 XP for advanced lab research
               setView('game');
             }}
           />
@@ -160,12 +256,78 @@ function App() {
         {state.currentView === 'leaderboard' && (
           <CyberAmbassadorLeaderboard onClose={() => setView('game')} />
         )}
+
+        {state.currentView === 'scanner' && (
+          <ScamScanner 
+            onClose={() => setView('game')} 
+            language={state.language}
+          />
+        )}
       </div>
+
+      {/* Digital Arrest Simulation */}
+      {state.showDigitalArrest && (
+        <DigitalArrestLab 
+          onClose={closeDigitalArrest} 
+        />
+      )}
+
+      {/* Cyber Info Corner Hub */}
+      {state.showInfoCorner && (
+        <CyberInfoCorner onClose={closeInfoCorner} />
+      )}
+
+      {/* Exceptional Feature: Phone Simulator */}
+      {state.showPhoneSim && (
+        <PhoneSimulator 
+          onClose={closePhoneSim} 
+          language={state.language}
+          isElderMode={state.isElderMode}
+        />
+      )}
+
+      {/* Exceptional Feature: Reverse Scam Builder */}
+      {state.showScamBuilder && (
+        <ScamBuilder 
+          onClose={closeScamBuilder} 
+          language={state.language}
+        />
+      )}
+
+      {/* Exceptional Feature: Family Shield (Viral Loop) */}
+      {state.showFamilyShield && (
+        <FamilyShield 
+          onClose={closeFamilyShield} 
+          language={state.language}
+        />
+      )}
+
+      {/* Social Reward: Cyber Shield Certificate */}
+      {state.showCertificate && (
+        <CyberShieldCertificate 
+          playerName={state.playerName}
+          score={state.certData.score}
+          total={state.certData.total}
+          onClose={closeCertificate}
+        />
+      )}
+
+      {/* Panic Meter Pulse Overlay */}
+      {state.stressLevel > 0 && (
+        <div 
+          className="panic-pulse-overlay" 
+          style={{ 
+            opacity: state.stressLevel / 100,
+            boxShadow: `inset 0 0 ${state.stressLevel * 2}px rgba(255, 0, 85, ${state.stressLevel / 100})`
+          }}
+        />
+      )}
 
       {/* Professional HUD Overlay */}
       {(state.currentView === 'game' || state.currentView === 'title') && (
         <NetGuardianHUD 
           progression={progression}
+          progressionData={progressionData}
           currentMission={state.currentMission}
           onMissionDecision={completeMission}
           setView={handleViewChange}
@@ -173,6 +335,10 @@ function App() {
           toggleElderMode={toggleElderMode}
           language={state.language}
           toggleLanguage={toggleLanguage}
+          openPhoneSim={openPhoneSim}
+          openScamBuilder={openScamBuilder}
+          openFamilyShield={openFamilyShield}
+          setAutoMoveTarget={setAutoMoveTarget}
         />
       )}
 
@@ -190,6 +356,7 @@ function App() {
         <FailureCutscene 
           scamType={state.failureData?.scamType}
           amountLost={state.failureData?.amountLost}
+          missionResult={state.lastMissionResult}
           onContinue={closeFailureCutscene}
         />
       )}
@@ -200,6 +367,7 @@ function App() {
       {/* Transition Effect */}
       {isTransitioning && <TransitionOverlay />}
     </div>
+    </GlobalErrorBoundary>
   )
 }
 

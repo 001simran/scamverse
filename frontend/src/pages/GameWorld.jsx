@@ -41,6 +41,15 @@ const BUILDINGS = [
     district: 1
   },
   {
+    id: 'forensics',
+    label: '⚖️ Digital Forensics',
+    color: '#311b92',
+    roofColor: '#1a237e',
+    x: -20, z: -10, w: 6, h: 8, d: 5,
+    mission: 'Digital Arrest Simulator',
+    district: 3
+  },
+  {
     id: 'cybercell',
     label: '🚔 Cyber Cell',
     color: '#4a148c',
@@ -48,6 +57,15 @@ const BUILDINGS = [
     x: 12, z: 8, w: 5, h: 7, d: 5,
     mission: 'Digital Arrest — Mission 4',
     district: 3
+  },
+  {
+    id: 'infocenter',
+    label: '🌐 Info Corner',
+    color: '#006064',
+    roofColor: '#00363a',
+    x: 20, z: -10, w: 5, h: 5, d: 6,
+    mission: 'Live Scam Directory',
+    district: 2
   },
   {
     id: 'awareness',
@@ -826,7 +844,7 @@ export default function GameWorld({
     window.addEventListener('keyup', onKeyUp)
 
     // ── GAME LOOP ─────────────────────────────────────────────
-    const SPEED = 5.5
+    const SPEED = isElderMode ? 3.8 : 5.5
     const BOUNDARY = 28
     let characterYaw = 0
 
@@ -843,13 +861,40 @@ export default function GameWorld({
 
       let moveX = 0
       let moveZ = 0
-      if (keys.up) moveZ = -1
-      if (keys.down) moveZ = 1
-      if (keys.left) moveX = -1
-      if (keys.right) moveX = 1
+
+      // --- AUTO-MOVE LERP LOGIC (Elder Mode Fast Travel) ---
+      if (state.autoMoveTarget) {
+        const targetX = state.autoMoveTarget.x
+        const targetZ = state.autoMoveTarget.z
+        const dx = targetX - char.position.x
+        const dz = targetZ - char.position.z
+        const dist = Math.sqrt(dx * dx + dz * dz)
+
+        if (dist > 1.2) {
+          const moveDir = Math.atan2(dx, dz)
+          moveX = Math.sin(moveDir)
+          moveZ = Math.cos(moveDir)
+        } else {
+          // Arrived! Clear the target
+          setAutoMoveTarget(null)
+          if (window.speechSynthesis) {
+            const msg = language === 'en' ? "Arrived at your destination." : "आप पहुंच गए हैं।";
+            const u = new SpeechSynthesisUtterance(msg);
+            u.lang = language === 'en' ? 'en-IN' : 'hi-IN';
+            window.speechSynthesis.speak(u);
+          }
+        }
+      } else {
+        // Normal Manual Movement
+        if (keys.up) moveZ = -1
+        if (keys.down) moveZ = 1
+        if (keys.left) moveX = -1
+        if (keys.right) moveX = 1
+      }
 
       const isMoving = moveX !== 0 || moveZ !== 0
-
+      
+      // ... existing movement application logic ...
       if (moveX !== 0 && moveZ !== 0) {
         moveX *= 0.707
         moveZ *= 0.707
@@ -885,10 +930,12 @@ export default function GameWorld({
       }
 
       // camera follow
-      const camOffsetX = -Math.sin(characterYaw) * 9
-      const camOffsetZ = -Math.cos(characterYaw) * 9
+      const camHeight = isElderMode ? 8.5 : 6.5
+      const camDistance = isElderMode ? 11 : 9
+      const camOffsetX = -Math.sin(characterYaw) * camDistance
+      const camOffsetZ = -Math.cos(characterYaw) * camDistance
       camera.position.x += (char.position.x + camOffsetX - camera.position.x) * 0.07
-      camera.position.y += (char.position.y + 6.5 - camera.position.y) * 0.07
+      camera.position.y += (char.position.y + camHeight - camera.position.y) * 0.07
       camera.position.z += (char.position.z + camOffsetZ - camera.position.z) * 0.07
       camera.lookAt(char.position.x, char.position.y + 1.0, char.position.z)
 

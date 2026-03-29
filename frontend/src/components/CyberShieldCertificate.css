@@ -1,0 +1,70 @@
+/* CyberShieldCertificate.css - Custom Reward for Seniors */
+.cert-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.95);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.cert-card {
+  width: 100%;
+  max-width: 900px;
+  background: white;
+  padding: 10px;
+}
+
+.cert-border {
+  border: 4px solid #00D9FF;
+  padding: 5px;
+}
+
+.cert-content {
+  border: 1px solid #aaa;
+  padding: 50px;
+  position: relative;
+  text-align: center;
+  color: #333;
+}
+
+.cert-header { margin-bottom: 40px; }
+.cert-seal { font-size: 80px; margin-bottom: 20px; }
+.cert-title { font-size: 42px; font-weight: bold; color: #1a1a2e; margin-bottom: 5px; }
+.cert-subtitle { font-size: 24px; color: #555; }
+
+.cert-recipient-section { margin-bottom: 50px; }
+.cert-label { font-size: 14px; text-transform: uppercase; color: #888; display: block; margin-bottom: 10px; }
+.cert-name { font-size: 48px; border-bottom: 2px solid #ccc; display: inline-block; padding: 0 40px 5px; text-transform: uppercase; color: #000; }
+.cert-desc { font-size: 18px; line-height: 1.6; max-width: 600px; margin: 30px auto; color: #555; }
+
+.cert-stats { display: flex; justify-content: space-around; background: #f9f9f9; padding: 20px; border-radius: 10px; margin-bottom: 50px; border: 1px dashed #ccc; }
+.cert-stat-label { font-size: 12px; display: block; color: #777; margin-bottom: 5px; }
+.cert-stat-value { font-size: 20px; font-weight: bold; color: #1a237e; }
+
+.cert-footer { display: flex; justify-content: space-between; border-top: 1px solid #eee; padding-top: 30px; }
+.cert-signature { font-size: 32px; font-family: 'Brush Script MT', cursive; color: #1a1a2e; border-bottom: 1px solid #333; width: 250px; margin-bottom: 5px; }
+.cert-date .cert-val { font-size: 24px; font-weight: bold; color: #1a1a2e; border-bottom: 1px solid #333; width: 200px; margin-bottom: 5px; }
+
+.cert-stamp { position: absolute; bottom: 100px; right: 80px; width: 150px; height: 150px; border: 4px solid #00FF41; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #00FF41; font-weight: bold; transform: rotate(-25deg); opacity: 0.2; font-size: 32px; }
+
+/* ACTION BUTTONS */
+.cert-actions { display: flex; justify-content: center; gap: 15px; margin-top: 30px; }
+.cert-btn-print { background: #1a1a2e; color: white; padding: 15px 30px; border-radius: 30px; border: none; font-weight: bold; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; }
+.cert-btn-share { background: #25D366; color: white; padding: 15px 30px; border-radius: 30px; border: none; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+.cert-btn-close { background: transparent; color: white; padding: 15px 30px; border-radius: 30px; border: 1px solid white; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+
+.cert-btn-print:hover { background: #00D9FF; color: black; }
+.cert-btn-share:hover { background: #128C7E; }
+.cert-btn-close:hover { background: rgba(255,255,255,0.1); }
+
+/* Hide other parts when printing */
+@media print {
+  body * { visibility: hidden; }
+  .cert-card, .cert-card * { visibility: visible; }
+  .cert-card { position: absolute; left: 0; top: 0; }
+  .cert-actions { display: none; }
+}

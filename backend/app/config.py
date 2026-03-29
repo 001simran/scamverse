@@ -1,27 +1,25 @@
 from pydantic_settings import BaseSettings
 from pydantic import ConfigDict
+from typing import Optional
 
 class Settings(BaseSettings):
-    # Database
-    database_url: str
+    # Database - defaults to SQLite for local dev
+    database_url: str = "sqlite:///./scamverse.db"
     
-    # API Keys
-    gemini_api_key: str
+    # API Keys - optional, falls back to keyword analysis
+    gemini_api_key: Optional[str] = None
     
     # CORS
-    frontend_origin: str
+    frontend_origin: str = "http://localhost:5174"
     
     # JWT Authentication
-    secret_key: str
-    access_token_expire_minutes: int = 30  # Default 30 minutes
-    algorithm: str = "HS256"  # Default algorithm
-    
-    # Optional: Add any other fields your app uses
-    # debug: bool = False
-    # allowed_origins: list = []
+    secret_key: str = "dev_secret_key_change_in_production_please"
+    access_token_expire_minutes: int = 30
+    algorithm: str = "HS256"
     
     model_config = ConfigDict(
         env_file=".env",
+        env_file_encoding="utf-8",
         extra="ignore"
     )
 

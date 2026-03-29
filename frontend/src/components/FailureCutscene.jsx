@@ -6,7 +6,7 @@
 
 import React, { useEffect, useState } from 'react';
 
-function FailureCutscene({ scamType, amountLost, onContinue }) {
+function FailureCutscene({ scamType, amountLost, missionResult, onContinue }) {
   const [visibleMessages, setVisibleMessages] = useState([]);
 
   const scenarioDetails = {
@@ -96,11 +96,18 @@ function FailureCutscene({ scamType, amountLost, onContinue }) {
         </div>
 
         {/* Narrative Messages */}
-        <div className="messages space-y-8 min-h-[300px]">
+        <div className="messages space-y-6 min-h-[250px]">
+          {/* Important feedback from the mission choice */}
+          {missionResult?.feedback && (
+            <p className="text-4xl text-yellow-400 font-bold mb-4 animate-in zoom-in duration-700">
+              {missionResult.feedback}
+            </p>
+          )}
+
           {visibleMessages.map((msg, index) => (
             <p 
               key={index} 
-              className="text-3xl md:text-4xl text-gray-200 font-medium animate-in fade-in slide-in-from-bottom-6 duration-1000"
+              className="text-2xl md:text-3xl text-gray-200 font-medium animate-in fade-in slide-in-from-bottom-6 duration-1000"
             >
               {msg}
             </p>
