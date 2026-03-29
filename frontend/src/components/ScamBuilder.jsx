@@ -161,7 +161,7 @@ export default function ScamBuilder({ onClose, language = 'en' }) {
               {t.lesson}
             </div>
 
-            <button className="sb-finish-btn" onClick={onClose}>{t.close}</button>
+            <button className="sb-finish-btn" onClick={onClose}>🏙️ GO TO CITY</button>
           </div>
         )}
       </div>

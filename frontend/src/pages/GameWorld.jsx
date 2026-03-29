@@ -120,7 +120,7 @@ export default function GameWorld({
   const lastAnnouncedRef = useRef(null)
   const ambientLightRef = useRef(null)
 
-  const { state, progressionData } = useGame()
+  const { state, progressionData, setAutoMoveTarget, language } = useGame()
   const citySecurity = progressionData?.city?.securityLevel ?? 60
 
   const partsRef = useRef({
@@ -875,13 +875,20 @@ export default function GameWorld({
           moveX = Math.sin(moveDir)
           moveZ = Math.cos(moveDir)
         } else {
-          // Arrived! Clear the target
+          // Arrived!
+          const target = state.autoMoveTarget
           setAutoMoveTarget(null)
+          
           if (window.speechSynthesis) {
-            const msg = language === 'en' ? "Arrived at your destination." : "आप पहुंच गए हैं।";
+            const msg = language === 'en' ? "Arrived. Entering now." : "पहुंच गए हैं। अब प्रवेश कर रहे हैं।";
             const u = new SpeechSynthesisUtterance(msg);
             u.lang = language === 'en' ? 'en-IN' : 'hi-IN';
             window.speechSynthesis.speak(u);
+          }
+
+          // AUTO-ENTER BUILDING
+          if (target.buildingId && onEnterBuilding) {
+            onEnterBuilding(target.buildingId)
           }
         }
       } else {

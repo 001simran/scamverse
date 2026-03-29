@@ -126,6 +126,12 @@ function FailureCutscene({ scamType, amountLost, missionResult, onContinue }) {
             >
               TRY AGAIN - LEARN THE RED FLAGS
             </button>
+            <button 
+              onClick={onContinue}
+              className="block w-full mt-6 bg-emerald-500 hover:bg-emerald-600 text-black text-2xl font-black px-12 py-4 rounded-xl transition-all"
+            >
+              🏙️ GO TO CITY
+            </button>
           </div>
         )}
       </div>

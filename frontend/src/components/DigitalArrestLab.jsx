@@ -78,8 +78,8 @@ const DigitalArrestLab = ({ onClose, onComplete }) => {
           <h2 style={{ color: '#00FF41', fontSize: '32px' }}>FORENSIC REPORT GENERATED</h2>
           <div style={{ fontSize: '100px', margin: '30px 0' }}>📂</div>
           <p style={{ fontSize: '24px', color: '#E8E8E8' }}>Survival Rate: {Math.round((score/scenarios.length)*100)}%</p>
-          <button className="external-link-btn" style={{ margin: '30px auto' }} onClick={onClose}>
-             RETURN TO CITY MAP
+          <button className="external-link-btn" style={{ margin: '30px auto', background: '#00D9FF', color: 'black' }} onClick={onClose}>
+             🏙️ GO TO CITY
           </button>
         </div>
       </div>
@@ -91,7 +91,10 @@ const DigitalArrestLab = ({ onClose, onComplete }) => {
       <div className="arrest-container">
         <div className="arrest-header">
            <span>🚨 DIGITAL ARREST SIMULATOR</span>
-           <span>SCORE: {score}/{scenarios.length}</span>
+          <span>SCORE: {score}/{scenarios.length}</span>
+          <button className="next-lab-btn" onClick={onClose} style={{ float: 'none', background: '#00D9FF', color: 'black' }}>
+            🏙️ GO TO CITY
+          </button>
         </div>
         
         <div className="arrest-content">
@@ -104,7 +107,7 @@ const DigitalArrestLab = ({ onClose, onComplete }) => {
                   <h3 style={{ color: 'white', marginTop: '20px' }}>{current.caller} Calling...</h3>
                   <div className="call-overlay">
                      <button className="call-btn accept" onClick={() => setIsCalling(false)}>📞</button>
-                     <button className="call-btn decline" onClick={onClose}>❌</button>
+                     <button className="call-btn decline" onClick={onClose}>🏙️ CITY</button>
                   </div>
                </div>
              ) : (

@@ -16,11 +16,13 @@ export default function NetGuardianHUD({
   toggleLanguage,
   openPhoneSim,
   openFamilyShield,
-  setAutoMoveTarget
+  setAutoMoveTarget,
+  onStartMission
 }) {
   const [showXPFloatingText, setShowXPFloatingText] = useState(null)
   const [showLevelUpAnimation, setShowLevelUpAnimation] = useState(false)
   const [verdict, setVerdict] = useState(null); // 'correct' or 'wrong'
+  const [selectedOption, setSelectedOption] = useState(null);
 
   const rank = progression.getCurrentRankInfo()
   const city = progression.getCitySecurityState()
@@ -181,10 +183,10 @@ export default function NetGuardianHUD({
       if (isElderMode) {
         // Structured linear journey map for Elders
         const elderLevels = [
-          { id: 1, en: "Level 1: WhatsApp Lottery Fraud", hi: "स्तर 1: वॉट्सऐप लॉटरी धोखाधड़ी", x: 20, z: -30 },
-          { id: 2, en: "Level 2: The Bank OTP Trap", hi: "स्तर 2: बैंक ओटीपी का जाल", x: 40, z: -10 },
-          { id: 3, en: "Level 3: Fake Police Call (Fear)", hi: "स्तर 3: नकली पुलिस कॉल (डर)", x: -20, z: 50 },
-          { id: 4, en: "Level 4: Urgent Electricity Threat", hi: "स्तर 4: बिजली कटने की धमकी", x: -50, z: 0 },
+          { id: 1, en: "Level 1: WhatsApp Lottery Fraud", hi: "स्तर 1: वॉट्सऐप लॉटरी धोखाधड़ी", x: -14, z: -10, buildingId: 'home' },
+          { id: 2, en: "Level 2: The City Bank Scam", hi: "स्तर 2: सिटी बैंक घोटाला", x: 12, z: -10, buildingId: 'bank' },
+          { id: 3, en: "Level 3: Police & Digital Arrest", hi: "स्तर 3: पुलिस और डिजिटल अरेस्ट", x: 12, z: 8, buildingId: 'cybercell' },
+          { id: 4, en: "Level 4: UPI QR Code Trap", hi: "स्तर 4: यूपीआई क्यूआर कोड जाल", x: -14, z: 8, buildingId: 'bazaar' },
         ];
 
         return (
@@ -214,27 +216,30 @@ export default function NetGuardianHUD({
                   return (
                     <button 
                       key={lvl.id}
-                      className={`action-btn journey-btn`}
+                      className={`action-btn journey-btn ${isCurrent ? 'pulse-current' : ''}`}
                       disabled={!isUnlocked && !isCurrent}
                       style={{ 
                         background: bgColor, border: `3px solid ${borderColor}`, color: textColor,
                         opacity: isUnlocked ? 1 : 0.6, transform: isCurrent ? 'scale(1.05)' : 'scale(1)',
-                        textAlign: 'left', display: 'flex', alignItems: 'center', gap: '10px'
+                        textAlign: 'left', display: 'flex', alignItems: 'center', gap: '15px',
+                        padding: '25px', borderRadius: '15px', fontSize: '24px', transition: 'all 0.3s'
                       }}
                       onClick={() => {
-                        setAutoMoveTarget({ x: lvl.x, z: lvl.z });
+                        setAutoMoveTarget({ x: lvl.x, z: lvl.z, buildingId: lvl.buildingId });
+                        if (onStartMission) onStartMission(lvl.buildingId);
+                        
                         if (window.speechSynthesis) {
                           const msg = language === 'en' 
-                            ? `Starting ${lvl.en}. Walking you there now.` 
-                            : `${lvl.hi} शुरू कर रहे हैं। आपको वहां ले जा रहे हैं।`;
+                            ? `Starting ${lvl.en}. Let's learn together.` 
+                            : `${lvl.hi} शुरू कर रहे हैं। आइए साथ मिलकर सीखें।`;
                           const u = new SpeechSynthesisUtterance(msg);
                           u.lang = language === 'en' ? 'en-IN' : 'hi-IN';
                           window.speechSynthesis.speak(u);
                         }
                       }}
                     >
-                      <span style={{fontSize: '32px'}}>{icon}</span>
-                      <span>{language === 'en' ? lvl.en : lvl.hi}</span>
+                      <span style={{fontSize: '42px'}}>{icon}</span>
+                      <span style={{fontWeight: '900'}}>{language === 'en' ? lvl.en : lvl.hi}</span>
                     </button>
                   )
                 })}
@@ -256,6 +261,17 @@ export default function NetGuardianHUD({
                 >
                   👨‍👩‍👧‍👦 {language === 'en' ? "Share Progress with Family" : "परिवार के साथ प्रगति साझा करें"}
                 </button>
+
+                <button 
+                  className="action-btn exit-elder-btn"
+                  onClick={() => toggleElderMode()}
+                  style={{
+                    background: 'transparent', border: '2px dashed #FF0055', color: '#FF0055', 
+                    marginTop: '25px', opacity: '0.8', fontSize: '16px'
+                  }}
+                >
+                  🚪 {language === 'en' ? "Return to Normal Mode" : "सामान्य मोड पर वापस जाएं"}
+                </button>
               </div>
             </div>
           </div>
@@ -274,16 +290,16 @@ export default function NetGuardianHUD({
     return (
       <div className="mission-card active">
         <div className="mission-header">
-          <span className="mission-title">{currentMission.victim.emoji} {currentMission.victim.name}</span>
+          <span className="mission-title">{currentMission.victim.avatar} {language === 'hi' && currentMission.victim.nameHi ? currentMission.victim.nameHi : currentMission.victim.name}</span>
           <span className="mission-difficulty">
             {'⭐'.repeat(currentMission.difficulty)}
           </span>
         </div>
         <div className="mission-situation">
-          {currentMission.victim.situation}
+          {language === 'hi' && currentMission.victim.situationHi ? currentMission.victim.situationHi : currentMission.victim.situation}
         </div>
         <div className="mission-message">
-          {currentMission.scamMessage}
+          {language === 'hi' && currentMission.scamMessageHi ? currentMission.scamMessageHi : currentMission.scamMessage}
         </div>
         <div className="mission-reward">
           <span>XP: +{currentMission.xpReward}</span>
@@ -297,9 +313,11 @@ export default function NetGuardianHUD({
             className="elder-guide-btn" 
             onClick={() => {
               if (window.speechSynthesis) {
-                const txt = language === 'en' 
-                  ? `Goal: Help ${currentMission.victim.name} who is in this situation: ${currentMission.victim.situation}`
-                  : `लक्ष्य: ${currentMission.victim.name} की मदद करें जो इस स्थिति में हैं: ${currentMission.victim.situation}`;
+                const name = language === 'hi' && currentMission.victim.nameHi ? currentMission.victim.nameHi : currentMission.victim.name;
+                const sit = language === 'hi' && currentMission.victim.situationHi ? currentMission.victim.situationHi : currentMission.victim.situation;
+                const txt = language === 'hi' 
+                  ? `लक्ष्य: ${name} की मदद करें जो इस स्थिति में हैं: ${sit}`
+                  : `Goal: Help ${name} who is in this situation: ${sit}`;
                 const utt = new SpeechSynthesisUtterance(txt);
                 utt.rate = 0.85;
                 utt.lang = language === 'en' ? 'en-IN' : 'hi-IN';
@@ -322,15 +340,15 @@ export default function NetGuardianHUD({
     
     const isCorrect = option.isCorrect;
     setVerdict(isCorrect ? 'correct' : 'wrong');
+    setSelectedOption(option);
     
     // Voice feedback if in Elder Mode or for general audio presence
     if (window.speechSynthesis) {
       window.speechSynthesis.cancel();
-      const msg = isCorrect 
-        ? (language === 'en' ? "Correct! Well done." : "सही है! बहुत अच्छे।") 
-        : (language === 'en' ? "Wrong. That was a scam." : "गलत! यह एक स्कैम था।");
-      const utterance = new SpeechSynthesisUtterance(msg);
+      const feedbackText = language === 'hi' && option.feedbackHi ? option.feedbackHi : option.feedback;
+      const utterance = new SpeechSynthesisUtterance(feedbackText);
       utterance.rate = 0.9;
+      utterance.lang = language === 'hi' ? 'hi-IN' : 'en-IN';
       window.speechSynthesis.speak(utterance);
     }
 
@@ -338,7 +356,8 @@ export default function NetGuardianHUD({
     setTimeout(() => {
       onMissionDecision(option);
       setVerdict(null);
-    }, 1200);
+      setSelectedOption(null);
+    }, 2500); // Increased delay for Elders to read the reason
   };
 
   // Keyboard support for A/B/C choices
@@ -373,6 +392,18 @@ export default function NetGuardianHUD({
                   ? (language === 'en' ? 'CORRECT!' : 'सही उत्तर!') 
                   : (language === 'en' ? 'WRONG!' : 'गलत उत्तर!')}
               </span>
+              
+              {selectedOption && (
+                <div className="verdict-reason" style={{
+                  marginTop: '15px', fontSize: '20px', color: '#fff', 
+                  background: 'rgba(255,255,255,0.1)', padding: '15px', 
+                  borderRadius: '10px', lineHeight: '1.4'
+                }}>
+                  {language === 'hi' && selectedOption.feedbackHi 
+                    ? selectedOption.feedbackHi 
+                    : selectedOption.feedback}
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -390,11 +421,11 @@ export default function NetGuardianHUD({
               onMouseLeave={(e) => {
                 e.currentTarget.style.boxShadow = 'inset 0 0 10px rgba(157, 0, 255, 0.2)'
               }}
-              data-tts={option.choice + ". " + option.text}
+              data-tts={option.choice + ". " + (language === 'hi' && option.textHi ? option.textHi : option.text)}
               disabled={!!verdict}
             >
               <div className="decision-choice">{option.choice}</div>
-              <div className="decision-text">{option.text}</div>
+              <div className="decision-text">{language === 'hi' && option.textHi ? option.textHi : option.text}</div>
             </button>
           ))}
         </div>
@@ -485,13 +516,28 @@ export default function NetGuardianHUD({
           <span className="level-badge" data-tts={language === 'en' ? `You are at Level ${rank.rankId}` : `आप लेवल ${rank.rankId} पर हैं।`}>Lvl {rank.rankId}</span>
           
           {/* High Visibility Elder Mode Toggle */}
-          <button 
-            className={`header-elder-toggle ${isElderMode ? 'active' : ''}`}
-            onClick={toggleElderMode}
-            data-tts={language === 'en' ? (isElderMode ? "Elder mode is on. Press to turn off." : "Turn on Elder Mode for voice assistance.") : (isElderMode ? "बुजुर्ग मोड चालू है। बंद करने के लिए दबाएं。" : "आवाज सहायता के लिए बुजुर्ग मोड चालू करें।")}
-          >
-            {isElderMode ? '👵 ON' : '👤 ELDER MODE'}
-          </button>
+          {!isElderMode ? (
+            <button 
+              className="header-elder-toggle"
+              onClick={toggleElderMode}
+              data-tts="Turn on Elder Mode for voice assistance."
+            >
+              👤 ELDER MODE
+            </button>
+          ) : (
+            <button 
+              className="header-exit-elder"
+              onClick={toggleElderMode}
+              style={{
+                background: '#FF0055', color: 'white', border: 'none', borderRadius: '8px',
+                padding: '12px 20px', fontSize: '18px', fontWeight: 'bold', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 0 20px rgba(255,0,85,0.4)'
+              }}
+              data-tts={language === 'en' ? "Exit Elder Mode and return to normal game." : "बुजुर्ग मोड से बाहर निकलें और सामान्य गेम पर वापस जाएं।"}
+            >
+              🚪 {language === 'en' ? 'EXIT ELDER MODE' : 'मोड से बाहर निकलें'}
+            </button>
+          )}
         </div>
 
         {/* Quick Stats Bar */}

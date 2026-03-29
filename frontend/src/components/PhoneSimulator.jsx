@@ -204,7 +204,19 @@ export default function PhoneSimulator({ onClose, language = 'en', isElderMode =
         <div className="phone-sim-header">
           <span className="phone-sim-logo">📱 {language === 'en' ? 'SCAM PHONE SIMULATOR' : 'स्कैम फोन सिम्युलेटर'}</span>
           <div className="phone-sim-score">🛡️ {score}/{SCENARIOS.length} {language === 'en' ? 'Safe' : 'सुरक्षित'}</div>
-          <button className="phone-sim-close" onClick={onClose}>✕ {language === 'en' ? 'EXIT' : 'बंद करें'}</button>
+          <button className="phone-sim-city-btn" onClick={onClose} style={{
+            background: 'white',
+            color: 'black',
+            fontWeight: 'bold',
+            borderRadius: '6px',
+            padding: '6px 12px',
+            border: 'none',
+            cursor: 'pointer',
+            marginRight: '10px'
+          }}>
+            🏙️ {language === 'en' ? 'GO TO CITY' : 'शहर वापस जाएं'}
+          </button>
+          <button className="phone-sim-close" onClick={onClose}>✕</button>
         </div>
 
         {/* SUBTITLE */}

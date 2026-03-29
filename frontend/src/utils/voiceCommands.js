@@ -2,17 +2,12 @@
  * VoiceCommandSystem.js
  * Advanced Web Speech API wrapper for ScamVerse
  * Supports Hindi and English commands for Elderly Accessibility (Elder Mode)
- *
- * UPDATED:
- *  - Building names rendered in Hindi when lang = 'hi'
- *  - TTS (speak) uses correct hi-IN / en-US voice based on active language
- *  - Speech recognition lang code switches live on setLanguage()
- *  - Keyboard shortcut listener: H = Hindi, E = English (while elder screen is active)
- *  - On elder screen open, bilingual prompt is spoken so user knows how to pick
- *  - All feedback strings (yes, no, start, help, etc.) are language-aware
  */
 
 class VoiceCommandSystem {
+  // ── Static Shared State (Prevents multiple instances from speaking confirmation twice) ──
+  static hasSpokenLangOnce = false;
+
   constructor() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -27,7 +22,6 @@ class VoiceCommandSystem {
     this.currentLanguageCode = 'en-US'; // passed to recognition.lang and utterance.lang
 
     this._setupRecognition();
-    this._setupKeyboardShortcuts();
 
     // ── Localised UI strings ──────────────────────────────────────────────────
     this.strings = {
@@ -70,7 +64,7 @@ class VoiceCommandSystem {
       'Awareness Center': 'जागरूकता केंद्र',
       'Scam Lab': 'स्कैम लैब',
       'Police Station': 'पुलिस थाना',
-      'Hospital': 'अस्पताल',
+      'Hospital': 'अ अस्पताल',
       'Market': 'बाज़ार',
       'School': 'विद्यालय',
     };
@@ -108,7 +102,7 @@ class VoiceCommandSystem {
 
   /** Translate building name to Hindi if language is hi, else return as-is */
   _translateBuilding(name) {
-    return (this.languageMode === 'hi' && this._buildingNames[name])
+    return (this.languageMode === 'hi' && this._buildingNames?.[name])
       ? this._buildingNames[name]
       : name;
   }
@@ -136,17 +130,11 @@ class VoiceCommandSystem {
   }
 
   /**
-   * Keyboard shortcut: H → Hindi, E → English
-   * Only fires while an element with id="screen-elder" has class "active".
+   * Keyboard shortcut helper (called from React App.jsx)
    */
-  _setupKeyboardShortcuts() {
-    document.addEventListener('keydown', (e) => {
-      const elderScreen = document.getElementById('screen-elder');
-      if (!elderScreen || !elderScreen.classList.contains('active')) return;
-
-      if (e.key === 'h' || e.key === 'H') this.setLanguage('hi');
-      else if (e.key === 'e' || e.key === 'E') this.setLanguage('en');
-    });
+  handleKeyDown(e) {
+    if (e.key === 'h' || e.key === 'H') this.setLanguage('hi');
+    else if (e.key === 'e' || e.key === 'E') this.setLanguage('en');
   }
 
   // ── Public API ──────────────────────────────────────────────────────────────
@@ -155,8 +143,19 @@ class VoiceCommandSystem {
    * Switch active language. Updates recognition lang code, re-starts recognition
    * if already running, and speaks a confirmation in the new language.
    * @param {'en'|'hi'} lang
+   * @param {boolean} isElder - NEW: passed to potentially skip speech feedback
    */
-  setLanguage(lang) {
+  setLanguage(lang, isElder = false) {
+    // Only speak once in normal mode per user request: "just once only in normal mode"
+    if (!VoiceCommandSystem.hasSpokenLangOnce && !isElder) {
+      if (this.strings && this.strings[lang]) {
+        this.speak(this.strings[lang].langSelected);
+      }
+      VoiceCommandSystem.hasSpokenLangOnce = true;
+    }
+
+    if (this.languageMode === lang) return; // Skip if no change
+    
     this.languageMode = lang;
     this.currentLanguageCode = lang === 'hi' ? 'hi-IN' : 'en-US';
 
@@ -164,9 +163,6 @@ class VoiceCommandSystem {
     this.stopListening();
     this.recognition.lang = this.currentLanguageCode;
     if (wasListening) this.startListening();
-
-    // Confirm in the newly chosen language
-    this.speak(this._s('langSelected'));
 
     // Fire event so UI can re-render language pills / command list
     window.dispatchEvent(new CustomEvent('voice-language-changed', { detail: { lang } }));
@@ -195,7 +191,7 @@ class VoiceCommandSystem {
    * @param {object} options - { rate, pitch, volume }
    */
   speak(text, options = {}) {
-    if (!this.synthesis) return;
+    if (!this.synthesis || !text) return;
     this.synthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = options.rate ?? 0.85;
@@ -219,8 +215,6 @@ class VoiceCommandSystem {
       try {
         this.recognition.start();
         this.isListening = true;
-        // Disabled auto-speech on activation as per user request for "no input speech"
-        // this.speak(this._s('activated'));
       } catch (e) {
         console.error("Failed to start recognition:", e);
       }

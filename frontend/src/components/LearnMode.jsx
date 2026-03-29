@@ -147,8 +147,8 @@ export default function LearnMode({ scamContent, onClose, missionResult }) {
 
         {/* Action Buttons */}
         <div className="learn-mode-actions">
-          <button className="btn-secondary" onClick={onClose}>
-            ← Back to Mission
+          <button className="btn-secondary" onClick={onClose} style={{ background: '#555', color: 'white' }}>
+            🏙️ GO TO CITY
           </button>
           <button className="btn-primary" onClick={onClose}>
             Continue to Next Mission →

@@ -17,10 +17,12 @@ export const SCAMS = {
     description: "Product advertised for ₹1, but full payment required after order",
     victim: {
       name: "Arjun",
+      nameHi: "अर्जुन",
       age: 22,
       profession: "Student",
       avatar: "👨‍💼",
-      situation: "Just saw an iPhone ad: 'BUY NOW FOR ₹1 ONLY! Limited time!'"
+      situation: "Just saw an iPhone ad: 'BUY NOW FOR ₹1 ONLY! Limited time!'",
+      situationHi: "अभी-अभी एक iPhone विज्ञापन देखा: 'सिर्फ ₹1 में खरीदें! सीमित समय के लिए!'"
     },
     scamMessage: `
       🛍️ HUGE SALE! 
@@ -30,6 +32,15 @@ export const SCAMS = {
       Hurry! Stock limited!
       
       [Order Now] [Share]
+    `,
+    scamMessageHi: `
+      🛍️ भारी सेल!
+      iPhone 14 Pro - अब सिर्फ ₹1 में
+      
+      यहाँ क्लिक करें 👉 bit.ly/supersal
+      जल्दी करें! स्टॉक सीमित है!
+      
+      [अभी ऑर्डर करें] [शेयर करें]
     `,
     redFlags: [
       "Price too good to be true (₹1 for a phone)",
@@ -41,24 +52,30 @@ export const SCAMS = {
       {
         choice: "A",
         text: "Don't buy. It's a classic bait-and-switch scam.",
+        textHi: "न खरीदें। यह एक धोखा है।",
         isCorrect: true,
         feedback: "✅ Correct! Prices this low are impossible for genuine products.",
+        feedbackHi: "✅ सही! इतनी कम कीमत पर असली सामान मिलना नामुमकिन है।",
         xpGain: 50,
         securityGain: 2
       },
       {
         choice: "B",
         text: "Order it, you can cancel if charged later.",
+        textHi: "ऑर्डर कर दें, बाद में कैंसिल कर सकते हैं।",
         isCorrect: false,
         feedback: "❌ Wrong! Once you place order + pay full amount, cancellation is rejected.",
+        feedbackHi: "❌ गलत! एक बार पैसे देने के बाद कैंसिलेशन नामुमकिन है।",
         xpGain: 0,
         securityGain: -1
       },
       {
         choice: "C",
         text: "Share with friends to get a referral discount.",
+        textHi: "दोस्तों के साथ शेयर करें ताकि डिस्काउंट मिले।",
         isCorrect: false,
         feedback: "❌ Wrong! This spreads the scam and you still pay full price.",
+        feedbackHi: "❌ गलत! यह घोटाले को फैलाता है और आपको पूरा पैसा देना पड़ता है।",
         xpGain: 0,
         securityGain: -1
       }
@@ -215,27 +232,34 @@ export const SCAMS = {
     description: "Fake email posing as bank asking to update credentials",
     victim: {
       name: "Vikram",
+      nameHi: "विक्रम",
       age: 35,
       profession: "Executive",
       avatar: "👨‍💼",
-      situation: "Got an email about account verification"
+      situation: "Got an email about account verification",
+      situationHi: "खाता वेरिफिकेशन के बारे में एक ईमेल मिला"
     },
     scamMessage: `
-      From: security@icicibank.in
-      Subject: ⚠️ URGENT: Update Your Account Information
-      
-      Dear Customer,
-      
-      We detected unusual activity on your account.
-      Please update your information within 24 hours or your 
-      account will be temporarily suspended.
-      
-      [VERIFY ACCOUNT NOW] 🔗
-      
-      Click the link below:
       https://icicbankverify.update/
       
       - ICICI Bank Security Team
+    `,
+    scamMessageHi: `
+      प्रेषक: security@icicibank.in
+      विषय: ⚠️ जरूरी: अपनी खाता जानकारी अपडेट करें
+      
+      प्रिय ग्राहक,
+      
+      हमने आपके खाते पर संदिग्ध गतिविधि देखी है।
+      कृपया अपनी जानकारी 24 घंटे के भीतर अपडेट करें वरना 
+      आपका खाता अस्थायी रूप से बंद कर दिया जाएगा।
+      
+      [अभी खाता सत्यापित करें] 🔗
+      
+      नीचे दिए गए लिंक पर क्लिक करें:
+      https://icicbankverify.update/
+      
+      - ICICI बैंक सुरक्षा टीम
     `,
     redFlags: [
       "Email asks for sensitive info (never real banks do this)",
@@ -249,24 +273,30 @@ export const SCAMS = {
       {
         choice: "A",
         text: "Delete email. Banks never ask credentials via email.",
+        textHi: "ईमेल डिलीट करें। बैंक कभी ईमेल पर जानकारी नहीं मांगते।",
         isCorrect: true,
         feedback: "✅ Correct! This is 100% phishing. Real banks never email verification requests.",
+        feedbackHi: "✅ सही! बैंक कभी भी वेरिफिकेशन लिंक ईमेल पर नहीं भेजते।",
         xpGain: 50,
         securityGain: 2
       },
       {
         choice: "B",
         text: "Click the link but don't enter real info, just to check.",
+        textHi: "लिंक पर क्लिक करें लेकिन असली जानकारी न दें।",
         isCorrect: false,
         feedback: "❌ Wrong! The link itself is dangerous. It auto-logs keystrokes.",
+        feedbackHi: "❌ गलत! लिंक खतरनाक हो सकता है और आपकी जानकारी चुरा सकता है।",
         xpGain: 0,
         securityGain: -1
       },
       {
         choice: "C",
         text: "Reply asking for verification before updating.",
+        textHi: "अपडेट करने से पहले जवाब मांगें।",
         isCorrect: false,
         feedback: "❌ Wrong! Replying confirms your email is active, triggers more scams.",
+        feedbackHi: "❌ गलत! जवाब देने से उन्हें पता चल जाता है कि आपका ईमेल चालू है।",
         xpGain: 0,
         securityGain: -1
       }
@@ -334,23 +364,28 @@ export const SCAMS = {
     description: "Fake authority claiming Aadhar/account suspended, demanding payment",
     victim: {
       name: "Rajesh",
+      nameHi: "राजेश",
       age: 55,
       profession: "Small Business Owner",
       avatar: "👨‍💼",
-      situation: "Got a scary call about account suspension"
+      situation: "Got a scary call about account suspension",
+      situationHi: "अकाउंट सस्पेंड होने के बारे में एक डरावनी कॉल आई"
     },
     scamMessage: `
-      📞 Incoming Call from "+91-XXXX500012"
+      - ICICI Bank Security Team
+    `,
+    scamMessageHi: `
+      📞 "+91-XXXX500012" से आ रही कॉल
       
-      [SCAMMER]: "Hello! This is Cyber Crime Cell speaking. 
-      Your Aadhar number has been linked to a money 
-      laundering case. Your account is suspended.
+      [स्कैमर]: "नमस्कार! मैं साइबर क्राइम सेल से बोल रहा हूँ।
+      आपका आधार नंबर मनी लॉन्ड्रिंग केस से जुड़ गया है।
+      आपका अकाउंट सस्पेंड कर दिया गया है।
       
-      You need to pay ₹50,000 immediately through UPI or 
-      we'll file an FIR against you. You'll go to jail."
+      अभी ₹50,000 का भुगतान करें वरना आपके खिलाफ FIR दर्ज होगी 
+      और आपको जेल जाना पड़ेगा।"
       
-      [SCAMMER]: "Don't tell anyone. Don't even contact 
-      your family. Transfer money NOW or police is coming."
+      [स्कैमर]: "किसी को बताना मत। अपने परिवार से भी बात मत करो। 
+      अभी पैसे ट्रांसफर करो वरना पुलिस आ रही है।"
     `,
     redFlags: [
       "Calls claiming authority (police never call this way)",
@@ -365,24 +400,30 @@ export const SCAMS = {
       {
         choice: "A",
         text: "Hang up immediately. Police never call for money. Report it.",
+        textHi: "तुरंत फोन काट दें। पुलिस कभी पैसे नहीं मांगती।",
         isCorrect: true,
         feedback: "✅ CORRECT! This is a sophisticated scam that has robbed lakhs from people.",
+        feedbackHi: "✅ सही! यह एक खतरनाक घोटाला है। पुलिस कभी फोन पर पैसे नहीं मांगती।",
         xpGain: 100,
         securityGain: 3
       },
       {
         choice: "B",
         text: "Pay ₹50k to avoid legal trouble. it's worth the safety.",
+        textHi: "जेल से बचने के लिए ₹50,000 दे दें।",
         isCorrect: false,
         feedback: "❌ WRONG! Real police won't call or demand digital payment. You're out ₹50k.",
+        feedbackHi: "❌ गलत! असली पुलिस कभी भी डिजिटल भुगतान की मांग नहीं करेगी।",
         xpGain: 0,
         securityGain: -2
       },
       {
         choice: "C",
         text: "Tell the scammer you'll contact the cyber cell yourself.",
+        textHi: "स्कैमर को कहें कि आप खुद साइबर सेल से बात करेंगे।",
         isCorrect: false,
         feedback: "❌ WRONG! This confirms your phone is active. They'll call repeatedly.",
+        feedbackHi: "❌ गलत! इससे उन्हें पता चल जाता है कि आप उनकी बात सुन रहे हैं।",
         xpGain: 0,
         securityGain: -2
       }
@@ -703,29 +744,34 @@ export const SCAMS = {
     description: "Fake refund from income tax, asking for verification details",
     victim: {
       name: "Ananya",
+      nameHi: "अनन्या",
       age: 32,
       profession: "Software Developer",
       avatar: "👩‍💻",
-      situation: "Got notification about tax refund"
+      situation: "Got notification about tax refund",
+      situationHi: "टैक्स रिफंड के बारे में सूचना मिली"
     },
     scamMessage: `
-      📧 Email from "income-tax-india@gov.in"
-      
-      Subject: Your income tax refund of ₹34,567 is ready!
-      
-      Dear Taxpayer,
-      
-      Your income tax return has been processed. 
-      A refund of ₹34,567 has been approved.
-      
-      To receive this refund to your account, please:
-      1. Click here to verify → [LINK]
-      2. Enter your PANID and bank details
-      3. OTP will be sent for confirmation
-      
-      This offer is valid for 48 hours only!
-      
       - Department of Income Tax
+    `,
+    scamMessageHi: `
+      📧 "income-tax-india@gov.in" से ईमेल
+      
+      विषय: आपका ₹34,567 का इनकम टैक्स रिफंड तैयार है!
+      
+      प्रिय करदाता,
+      
+      आपके इनकम टैक्स रिटर्न की प्रक्रिया पूरी हो गई है। 
+      ₹34,567 का रिफंड मंजूर कर लिया गया है।
+      
+      रिफंड प्राप्त करने के लिए:
+      1. यहाँ क्लिक करें → [लिंक]
+      2. अपना PAN और बैंक विवरण भरें
+      3. पुष्टि के लिए OTP भेजा जाएगा
+      
+      यह लिंक केवल 48 घंटों के लिए है!
+      
+      - आयकर विभाग
     `,
     redFlags: [
       "Income tax never gives refunds via email/SMS",
@@ -740,24 +786,30 @@ export const SCAMS = {
       {
         choice: "A",
         text: "Log into official incometax.gov.in directly. Never click email links.",
+        textHi: "सीधे आधिकारिक वेबसाइट पर जाएं। ईमेल लिंक पर क्लिक न करें।",
         isCorrect: true,
         feedback: "✅ CORRECT! Income tax portals never email verification requests.",
+        feedbackHi: "✅ सही! इनकम टैक्स विभाग कभी ईमेल पर लिंक नहीं भेजता।",
         xpGain: 100,
         securityGain: 2
       },
       {
         choice: "B",
         text: "Click link and enter PAN to claim your refund.",
+        textHi: "लिंक पर क्लिक करें और रिफंड पाने के लिए PAN भरें।",
         isCorrect: false,
         feedback: "❌ WRONG! You've given scammer your PAN. Identity theft risk now high.",
+        feedbackHi: "❌ गलत! आपने अपना PAN दे दिया है, जिससे आपकी पहचान चोरी हो सकती है।",
         xpGain: 0,
         securityGain: -2
       },
       {
         choice: "C",
         text: "Reply to email asking for more details.",
+        textHi: "अधिक जानकारी के लिए ईमेल का उत्तर दें।",
         isCorrect: false,
         feedback: "❌ WRONG! Replying confirms email is active, triggers more scams.",
+        feedbackHi: "❌ गलत! उत्तर देने से उन्हें पता चल जाता है कि आपका ईमेल सक्रिय है।",
         xpGain: 0,
         securityGain: -1
       }

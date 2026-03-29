@@ -77,13 +77,30 @@ function App() {
     }, 500)
   }
 
-  // Voice Command & Language Integration
+  // Voice Command & Language Keyboard Shortcuts (H/E Keys)
   useEffect(() => {
-    voiceSystem.setLanguage(state.language);
-    
+    const handleKeyDown = (e) => {
+      // Only fire shortcuts if Elder mode overlay is actually visible or active
+      const elderScreen = document.getElementById('screen-elder');
+      if (state.isElderMode || (elderScreen && elderScreen.classList.contains('active'))) {
+        voiceSystem.handleKeyDown(e);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [state.isElderMode, voiceSystem]);
+
+  // Language Synchronization
+  useEffect(() => {
+    voiceSystem.setLanguage(state.language, state.isElderMode);
+  }, [state.language, state.isElderMode, voiceSystem]);
+
+  // Voice Command & Event Listeners
+  useEffect(() => {
     // In Elder mode, we don't 'listen' for commands, but we do use the speaker system
     if (state.isElderMode) {
-      voiceSystem.stopListening(); // Ensure listening is off as requested
+      voiceSystem.stopListening();
       
       const handleVoiceStart = () => setView('game');
       const handleVoiceSelect = (e) => {
@@ -108,7 +125,7 @@ function App() {
     } else {
       voiceSystem.stopListening();
     }
-  }, [state.isElderMode, state.currentMission, state.language]);
+  }, [state.isElderMode, state.currentMission, state.language, voiceSystem]);
 
   // Voice confirmation for state changes (Accessibility)
   useEffect(() => {
@@ -123,12 +140,7 @@ function App() {
     }
   }, [state.isElderMode]);
 
-  useEffect(() => {
-    // Skip speech if not in elder mode
-    if (!state.isElderMode) return;
-    const msg = state.language === 'en' ? "Language changed to English." : "भाषा बदलकर अब हिंदी हो गई है।";
-    voiceSystem.speak(msg);
-  }, [state.language]);
+  /* Redundant language announcement removed per user request: "NO NEED TO SAY english selected evrytime" */
 
   // Handle TTS on hover globally
   useEffect(() => {
@@ -187,6 +199,9 @@ function App() {
 
   // Handle building entry from 3D world
   const handleEnterBuilding = (buildingId) => {
+    // Prevent restarting if already in a mission
+    if (state.currentMission) return;
+
     switch(buildingId) {
       case 'home':
         startMission('phishing_email')
@@ -330,6 +345,7 @@ function App() {
           progressionData={progressionData}
           currentMission={state.currentMission}
           onMissionDecision={completeMission}
+          onStartMission={handleEnterBuilding}
           setView={handleViewChange}
           isElderMode={state.isElderMode}
           toggleElderMode={toggleElderMode}

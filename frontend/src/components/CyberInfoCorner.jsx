@@ -49,7 +49,9 @@ const CyberInfoCorner = ({ onClose }) => {
              <h2>🌐 SCAM DIRECTORY & REPORTING</h2>
              <p style={{ color: '#A8A8C8', margin: '5px 0 0 0' }}>Latest threats in the digital ecosystem</p>
           </div>
-          <button className="next-lab-btn" onClick={onClose} style={{ float: 'none' }}>EXIT HUB</button>
+          <button className="next-lab-btn" onClick={onClose} style={{ float: 'none', background: '#00D9FF', color: 'black' }}>
+            🏙️ GO TO CITY
+          </button>
         </div>
 
         <div className="info-corner-content">

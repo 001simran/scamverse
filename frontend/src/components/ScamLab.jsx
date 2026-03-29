@@ -88,7 +88,11 @@ const ScamLab = ({ onClose, onComplete }) => {
   // Auto-scan animation
   useEffect(() => {
     setIsScanning(true);
-    const timer = setTimeout(() => setIsScanning(false), 2000);
+    const timer = setTimeout(() => {
+      setIsScanning(false);
+      // Announce title when scan completes (Accessibility)
+      speak(`Analysis ready. Specimen: ${currentScenario.title}`);
+    }, 2000);
     return () => clearTimeout(timer);
   }, [currentIdx]);
 
@@ -130,8 +134,8 @@ const ScamLab = ({ onClose, onComplete }) => {
           <h2 style={{ color: '#00FF41', fontSize: '32px' }}>RESEARCH COMPLETE</h2>
           <div style={{ fontSize: '80px', margin: '30px 0' }}>📂</div>
           <p style={{ fontSize: '24px', color: '#E8E8E8' }}>Analysis Accuracy: {Math.round((score/labScenarios.length)*100)}%</p>
-          <button className="next-lab-btn" style={{ float: 'none', marginTop: '30px' }} onClick={onClose}>
-            RETURN TO CITY MAP
+          <button className="next-lab-btn" style={{ float: 'none', marginTop: '30px', background: '#FFB300', color: 'black' }} onClick={onClose}>
+            🏙️ GO TO CITY
           </button>
         </div>
       </div>
@@ -142,13 +146,46 @@ const ScamLab = ({ onClose, onComplete }) => {
     <div className="scam-lab-overlay">
       <div className="lab-container animate-slide-up">
         <div className="lab-header">
-           <h2>🧪 CYBER SCAM FORENSICS LAB</h2>
+           <div className="flex items-center gap-4">
+             <h2>🧪 CYBER SCAM FORENSICS LAB</h2>
+             <button className="next-lab-btn" onClick={onClose} style={{
+               float: 'none',
+               margin: 0,
+               background: '#FFB300',
+               color: 'black',
+               fontSize: '12px',
+               padding: '6px 12px',
+               fontWeight: 'bold',
+               borderRadius: '6px',
+               boxShadow: '0 0 10px rgba(255, 179, 0, 0.4)'
+             }}>
+               🏙️ GO TO CITY
+             </button>
+           </div>
            <div style={{ color: '#E8E8E8', fontSize: '14px', background: 'rgba(0,0,0,0.5)', padding: '5px 15px', borderRadius: '20px' }}>
               Specimen: {currentIdx + 1} / {labScenarios.length} | Security Points: {score * 100}
            </div>
         </div>
 
         <div className="lab-content">
+          {currentScenario.type === 'voice' && (
+            <div className="ai-cloning-badge animate-pulse" style={{
+              position: 'absolute',
+              top: '80px',
+              left: '30px',
+              background: '#FF0055',
+              color: 'white',
+              padding: '6px 15px',
+              borderRadius: '20px',
+              fontWeight: 'black',
+              fontSize: '14px',
+              zIndex: 10,
+              boxShadow: '0 0 20px rgba(255, 0, 85, 0.5)',
+              border: '2px solid white'
+            }}>
+              🚨 AI VOICE CLONING DETECTED
+            </div>
+          )}
           <div className="specimen-display">
             {isScanning && <div className="scan-line"></div>}
             
@@ -170,6 +207,13 @@ const ScamLab = ({ onClose, onComplete }) => {
           <div className="analysis-panel">
             <h3 style={{ color: 'white', margin: '0 0 10px 0' }}>{currentScenario.title}</h3>
             <p style={{ color: '#A8A8C8', fontSize: '12px', lineHeight: '1.4' }}>{currentScenario.description}</p>
+
+            <div className="data-module" style={{ borderLeftColor: '#FF0055' }}>
+              <div className="module-title" style={{ color: '#FF0055' }}>Source Type</div>
+              <div style={{ fontSize: '16px', color: '#FF0055', fontWeight: '900' }}>
+                {currentScenario.type === 'voice' ? '🚨 AI VOICE CLONING' : '🖼️ DEEPFAKE IMAGE'}
+              </div>
+            </div>
 
             <div className="data-module">
               <div className="module-title">Digital Signature Analysis</div>

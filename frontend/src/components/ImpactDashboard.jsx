@@ -92,12 +92,20 @@ function ImpactDashboard({ onClose }) {
             </h1>
             <p className="text-xl text-gray-400 mt-2">ScamVerse: Protecting India one player at a time</p>
           </div>
-          <button 
-            onClick={onClose}
-            className="bg-white/10 hover:bg-white/20 text-white p-4 rounded-full transition-colors"
-          >
-            <span className="text-3xl">✕</span>
-          </button>
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={onClose}
+              className="bg-emerald-500 hover:bg-emerald-600 text-black px-6 py-3 rounded-full font-bold transition-all"
+            >
+              🏙️ GO TO CITY
+            </button>
+            <button 
+              onClick={onClose}
+              className="bg-white/10 hover:bg-white/20 text-white p-4 rounded-full transition-colors"
+            >
+              <span className="text-3xl">✕</span>
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">

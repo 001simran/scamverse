@@ -67,7 +67,7 @@ export default function CyberShieldCertificate({ playerName, score, total, date,
         <div className="cert-actions">
           <button className="cert-btn-print" onClick={handlePrint}>🖨️ Save as PDF</button>
           <button className="cert-btn-share" onClick={handleShare}>📱 Share to WhatsApp</button>
-          <button className="cert-btn-close" onClick={onClose}>Back to Home</button>
+          <button className="cert-btn-close" onClick={onClose} style={{ background: '#00FF41', border: 'none', color: 'black', fontWeight: 'bold' }}>🏙️ GO TO CITY</button>
         </div>
       </div>
     </div>

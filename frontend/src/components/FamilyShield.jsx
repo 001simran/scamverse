@@ -103,6 +103,20 @@ export default function FamilyShield({ onClose, language = 'en' }) {
              <button className="fs-copy-btn" onClick={handleCopy}>
                 {copied ? t.copied : t.copyBtn}
              </button>
+
+             <button className="fs-city-btn" onClick={onClose} style={{
+               marginTop: '15px',
+               width: '100%',
+               background: '#333',
+               color: 'white',
+               border: 'none',
+               padding: '12px',
+               borderRadius: '12px',
+               fontWeight: 'bold',
+               cursor: 'pointer'
+             }}>
+               🏙️ {language === 'en' ? 'GO TO CITY' : 'शहर वापस जाएं'}
+             </button>
           </div>
         </div>
       </div>

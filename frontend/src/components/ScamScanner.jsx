@@ -198,8 +198,19 @@ const ScamScanner = ({ onClose, language = 'en' }) => {
           </div>
         )}
 
-        <div className="scanner-footer">
-          <button className="footer-close-btn" onClick={onClose}>{t.close}</button>
+        <div className="scanner-footer" style={{ display: 'flex', gap: '10px' }}>
+          <button className="footer-close-btn" onClick={onClose} style={{ flex: 1 }}>{t.close}</button>
+          <button className="footer-city-btn" onClick={onClose} style={{
+            flex: 1,
+            background: '#00D9FF' ,
+            color: 'black',
+            fontWeight: 'bold',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer'
+          }}>
+            🏙️ {language === 'en' ? 'GO TO CITY' : 'शहर वापस जाएं'}
+          </button>
         </div>
       </div>
     </div>

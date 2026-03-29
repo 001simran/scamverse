@@ -34,12 +34,20 @@ function CyberAmbassadorLeaderboard({ onClose }) {
             </h2>
             <p className="text-xl text-gray-400 mt-2">Heroes protecting their families and communities</p>
           </div>
-          <button 
-            onClick={onClose}
-            className="bg-white/10 hover:bg-white/20 text-white p-4 rounded-full transition-colors"
-          >
-            <span className="text-3xl">✕</span>
-          </button>
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={onClose}
+              className="bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-3 rounded-full font-bold transition-all shadow-[0_0_20px_rgba(234,179,8,0.3)]"
+            >
+              🏙️ GO TO CITY
+            </button>
+            <button 
+              onClick={onClose}
+              className="bg-white/10 hover:bg-white/20 text-white p-4 rounded-full transition-colors"
+            >
+              <span className="text-3xl">✕</span>
+            </button>
+          </div>
         </div>
 
         <div className="leaders space-y-6">
